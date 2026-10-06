@@ -48,6 +48,11 @@
 
 （MTok、rubric、map-reduce 沒加：它們在卡上只是 blog 引文裡的單位或名稱標籤。）
 
+**第二次實跑（jev-as-a-judge）後經人確認加入**
+- held-out（驗收集，完全沒參與選參數、只用來最後驗收的資料）
+- logit（模型輸出的原始分數）
+- 信賴區間（confidence interval）
+
 ## 刻意不放的詞（需要在卡上解釋）
 
 - RLHF、RLVR、reward model、proper scoring rule、KV cache、constrained decoding、Bradley-Terry
