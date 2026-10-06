@@ -13,7 +13,7 @@ uv run python tests/test_stage1_programs.py
 | 範圍 | 測什麼 |
 |---|---|
 | `validate_card` 擋下 | 數字沒有比較對象、沒有脈絡主張、兩條 thesis、引文捏造、引文不在列出的小節、豁免卻含倍數、豁免理由不在清單、author_confirmed 沒日期、錨點類型不在清單、thesis 重要度、缺 article_title、article_title 與 blog 不符、小節不存在、related 指向不存在、id 與檔名不符、claim id 重複、沒有 claim |
-| `validate_card` 放行（測誤殺） | 目前 wiki 裡的每一張卡都必須通過 |
+| `validate_card` 放行（測誤殺） | `tests/fixtures/concepts/` 的每一張卡都必須通過（這是第一次實跑的 6 張卡，留作測試資料，不屬於真實觀念庫） |
 | `make_auditor_copy` | 每條引文都能定位到段落；`--only` 只列其他主張文字；quote 模式沒有段落；不洩漏 url |
 | `verify_audit` | 全部完全支持通過；不支持、數字對不上、漏審擋下；措辭不同、部分支持、審查者捏造引用、其他錨點邊界、pending 主張的問題只記錄；卡標官方宣稱而錨點被判不支持擋下；`--copy` 越界讀 blog 列備註 |
 | `verify_final_audit` | 沒發現通過；斷章取義擋下；審查者引用不逐字、pending、卡漏掉重點只記錄；跨卡矛盾與 blog 矛盾 exit 2 |
@@ -43,6 +43,6 @@ uv run python tests/test_stage1_programs.py
 
 ## 3. 未驗證事項
 
-- 對證者只看引文與段落（paragraph 模式）時，斷章取義的抓取率；quote 模式更低，要靠全文審查補。第一次重構後只做過一次煙霧測試，結果見 `docs/first-run-findings.md` 末段。
+- 對證者只看引文與段落（paragraph 模式）時，斷章取義的抓取率；quote 模式更低，要靠全文審查補。第一次重構後只做過一次煙霧測試，之後要量就在實跑時記錄。
 - 審查者之間可能有共同盲點（同一個模型）。人需偶爾冷讀抽查幾張卡，這是迴圈唯一的外部校準。
 - 對證者、讀者各 5 輪的上限是否足夠；5 輪後是否仍會在錨點邊界反覆翻轉（第一次實跑 3 輪時會）。

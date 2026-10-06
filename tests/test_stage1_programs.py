@@ -12,11 +12,14 @@ import contextlib
 import copy
 import io
 import json
+import os
 import sys
 import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+# 測試用的卡放在 tests/fixtures/concepts/（wiki/concepts/ 是真實觀念庫，可能是空的）
+os.environ["DSO_CARDS_DIR"] = str(ROOT / "tests" / "fixtures" / "concepts")
 sys.path.insert(0, str(ROOT / ".claude/skills/distill-article/scripts"))
 
 import make_auditor_copy as MAC  # noqa: E402

@@ -4,6 +4,7 @@
 """
 from __future__ import annotations
 
+import os
 import re
 import unicodedata
 from dataclasses import dataclass, field
@@ -21,6 +22,8 @@ def project_root() -> Path:
 
 
 ROOT = project_root()
+# 觀念卡目錄；環境變數 DSO_CARDS_DIR 只給測試用（指向 tests/fixtures/concepts）
+CARDS_DIR = Path(os.environ.get("DSO_CARDS_DIR") or ROOT / "wiki" / "concepts")
 
 
 def load_params() -> dict:
@@ -189,4 +192,4 @@ def parse_card(path: Path) -> Card:
 
 
 def load_all_cards() -> list[Card]:
-    return [parse_card(p) for p in sorted((ROOT / "wiki" / "concepts").glob("*.md"))]
+    return [parse_card(p) for p in sorted(CARDS_DIR.glob("*.md"))]

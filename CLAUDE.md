@@ -25,8 +25,6 @@ blog 文章（blog/ submodule）──[Stage 1：提煉觀念]──> wiki/conce
 | 卡長什麼樣、欄位與驗證規則 | `docs/card-format.md`（契約，Stage 1 與 Stage 2 共用） |
 | 調整參數 | `config/params.yaml`（輪數上限、錨點類型清單、數字豁免…） |
 | 背景詞清單（人維護） | `config/background-terms.md` |
-| 已討論但還沒做的改進 | `docs/backlog.md` |
-| 第一次實跑發現的問題與當時的處理 | `docs/first-run-findings.md`（歷史紀錄，結論已併入 skill） |
 
 ## 不可違反的規則
 
@@ -45,11 +43,11 @@ blog 文章（blog/ submodule）──[Stage 1：提煉觀念]──> wiki/conce
 ```
 CLAUDE.md
 .claude/skills/distill-article/   Stage 1 的流程、腳本、審查者提示詞
-docs/                             card-format.md（契約）、backlog.md、first-run-findings.md
+docs/                             card-format.md（契約，Stage 1 與 Stage 2 共用）
 config/                           params.yaml、background-terms.md（人會改的放這裡）
 wiki/                             index.md（程式產生）、concepts/<id>.md
 blog/                             blog 的 submodule（唯讀）
-tests/                            test_stage1_programs.py
+tests/                            test_stage1_programs.py、fixtures/concepts/（測試用的卡，不是真實觀念庫）
 ```
 
 為什麼 `config/` 不放進 skill：這是人會調整的設定與人維護的詞表，放在根目錄一眼找得到；流程知識（agent 怎麼做事）才放 `.claude/`。`docs/card-format.md` 也留在根目錄，因為它是給下游 repo 看的契約，不只是給本 repo 的 skill 看。
@@ -62,11 +60,11 @@ tests/                            test_stage1_programs.py
 
 ## 目前狀態
 
-- 第一次實跑完成（2026-10-04）：`jev-overview` 提煉出 6 張卡，已放行並寫入 `wiki/concepts/`（108 條主張，8 條 pending 不供下游使用）。
+- 觀念庫目前是空的（`wiki/concepts/` 沒有卡），準備用重構後的流程從頭重跑。第一次實跑的 6 張卡（`jev-overview`）留在 `tests/fixtures/concepts/` 當測試資料，完整歷史在 git。
 - 重構後（2026-10-04）流程改為：對證者只看引文與段落 → 讀者看移除引用的卡 → 全文審查每篇一次。**這個新流程還沒有跑過真實文章**，下一次實跑要量 token 並記進 `docs/`。
 
 ## 工作方式
 
 - `docs/card-format.md` 與 skill 是依實測整理出來的；細節有疑問時以它們為準，沒寫到的先問人，不要自己決定。
 - 修改任何程式檢查或審查流程後，跑 `uv run python tests/test_stage1_programs.py`；新增檢查要加「故意做壞的版本」確認抓得到。
-- 範例資料：`wiki/concepts/confound-three-questions.md` 是完整範例卡。
+- 範例資料：`tests/fixtures/concepts/confound-three-questions.md` 是完整範例卡。
