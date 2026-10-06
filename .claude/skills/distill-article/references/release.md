@@ -36,7 +36,7 @@
 - 三關審查的結果摘要（對證者與讀者各幾輪、blocker 有哪些已修、全文審查結果）；
 - pending 與 author_confirmed 清單（含 blog 矛盾的具體內容，供人決定要不要修 blog）；
 - 通用知識詞與去重關係的處理結果；
-- 審查的 token 用量（subagent 回報的 usage 加總，按對證者、讀者、全文審查分開）——第一次實跑後成本是主要痛點，每次都量，累積到 `docs/`。
+- 審查的 token 用量（subagent 回報的 usage 加總，按對證者、讀者、全文審查分開）——第一次實跑後成本是主要痛點，每次都量，累積到 `docs/stage1-token-usage.md`。表格欄位：類別、subagent 個數、token、占比；另列「沒採用結果的 subagent」（重複派發、被併掉的卡的審查等）與哪些地方花得不合理。
 
 ## 4. blog 改了之後
 

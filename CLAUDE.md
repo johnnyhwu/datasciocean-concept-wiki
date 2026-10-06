@@ -35,15 +35,16 @@ blog 文章（blog/ submodule）──[Stage 1：提煉觀念]──> wiki/conce
 5. **每個數字都要有比較對象；錨點類型要標對。** 「官方宣稱」標錯會直接擋下。
 6. **限定條件綁在主張上**（`qualifiers`），下游用主張就必須帶出它的限定條件。
 7. **寧可暫停，也不降低標準。** 輪數用完仍有 blocker，升級給人，不自動放行。
-8. **不確定就停下來問人。** 去重與關係、blog 內部矛盾、通用知識詞、爭議條目、新增的 pending，都由人決定。
+8. **不確定就停下來問人。** 寫卡前的提案清單、去重與關係、blog 內部矛盾、通用知識詞、爭議條目、新增的 pending，都由人決定。
 9. **環境限縮在 repo 內。** uv 的快取與虛擬環境都在 repo 內。
+10. **撰寫者寫卡時就要謹慎。** 審查是最後防線，不是替撰寫者找限定條件的工具；照 `card-writing.md` §11 自檢，避免審查者來回多次、甚至全文審查才抓到問題。
 
 ## 目錄
 
 ```
 CLAUDE.md
 .claude/skills/distill-article/   Stage 1 的流程、腳本、審查者提示詞
-docs/                             card-format.md（契約，Stage 1 與 Stage 2 共用）
+docs/                             card-format.md（契約，Stage 1 與 Stage 2 共用）、stage1-token-usage.md（實跑的 token 紀錄）
 config/                           params.yaml、background-terms.md（人會改的放這裡）
 wiki/                             index.md（程式產生）、concepts/<id>.md
 blog/                             blog 的 submodule（唯讀）
@@ -60,8 +61,9 @@ tests/                            test_stage1_programs.py、fixtures/concepts/�
 
 ## 目前狀態
 
-- 觀念庫目前是空的（`wiki/concepts/` 沒有卡），準備用重構後的流程從頭重跑。第一次實跑的 6 張卡（`jev-overview`）留在 `tests/fixtures/concepts/` 當測試資料，完整歷史在 git。
-- 重構後（2026-10-04）流程改為：對證者只看引文與段落 → 讀者看移除引用的卡 → 全文審查每篇一次。**這個新流程還沒有跑過真實文章**，下一次實跑要量 token 並記進 `docs/`。
+- 觀念庫有 5 張卡（來自 `jev-as-a-judge`，2026-10-06 第二次實跑，尚未 commit）。第一次實跑的 6 張卡（`jev-overview`）留在 `tests/fixtures/concepts/` 當測試資料，完整歷史在 git。
+- 流程是：對證者只看引文與段落 → 讀者看移除引用的卡 → 全文審查每篇一次。第二次實跑量過 token，見 `docs/stage1-token-usage.md`。
+- 2026-10-06 加入：寫卡前先給人看提案（提案階段不看主張數）→ 合併後檢查每張卡 10 到 20 條主張（`validate_card.py --claim-count`）→ 審查開始後不再併卡；補審合併成一個 subagent；只動限定條件不重跑讀者。
 
 ## 工作方式
 

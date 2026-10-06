@@ -8,11 +8,12 @@
 uv run python tests/test_stage1_programs.py
 ```
 
-共 50 項，涵蓋：
+共 54 項，涵蓋：
 
 | 範圍 | 測什麼 |
 |---|---|
 | `validate_card` 擋下 | 數字沒有比較對象、沒有脈絡主張、兩條 thesis、引文捏造、引文不在列出的小節、豁免卻含倍數、豁免理由不在清單、author_confirmed 沒日期、錨點類型不在清單、thesis 重要度、缺 article_title、article_title 與 blog 不符、小節不存在、related 指向不存在、id 與檔名不符、claim id 重複、沒有 claim |
+| `validate_card --claim-count` | 主張數低於下限、高於上限擋下；下限與上限本身放行；預設不檢查、加旗標才擋（旗標有接上） |
 | `validate_card` 放行（測誤殺） | `tests/fixtures/concepts/` 的每一張卡都必須通過（這是第一次實跑的 6 張卡，留作測試資料，不屬於真實觀念庫） |
 | `make_auditor_copy` | 每條引文都能定位到段落；`--only` 只列其他主張文字；quote 模式沒有段落；不洩漏 url |
 | `verify_audit` | 全部完全支持通過；不支持、數字對不上、漏審擋下；措辭不同、部分支持、審查者捏造引用、其他錨點邊界、pending 主張的問題只記錄；卡標官方宣稱而錨點被判不支持擋下；`--copy` 越界讀 blog 列備註 |

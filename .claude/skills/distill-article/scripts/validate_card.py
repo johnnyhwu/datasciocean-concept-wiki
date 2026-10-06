@@ -1,7 +1,10 @@
 """觀念卡驗證（結構驗證 + 來源原文逐字比對；規則見 docs/card-format.md §8）。
 
-用法：uv run python .claude/skills/distill-article/scripts/validate_card.py [card.md ...]
+用法：uv run python .claude/skills/distill-article/scripts/validate_card.py [--claim-count] [card.md ...]
       不給參數則驗證 wiki/concepts/ 全部
+      --claim-count：另外檢查每張卡的主張數是否在 params 的 wiki.card_claim_range 內（含 pending 主張）。
+                     只在「合併階段」（提案確認、合併完成之後）加這個旗標；挖卡與提案階段不要用，
+                     避免為了湊主張數而把卡寫大。預設不檢查。
 結束碼：0 通過（可能有 HINT）、1 有 ERROR。
 HINT 不退回，交給對證者（主張數字不在來源原文）。
 """
@@ -146,7 +149,20 @@ def check_card(card: W.Card, all_ids: set[str], params: dict, blogs: dict) -> tu
     return err, hint
 
 
+def check_claim_count(card: W.Card, params: dict) -> list[str]:
+    """主張數必須在 wiki.card_claim_range 內（含 pending 主張）。只在合併階段用 --claim-count 啟用。"""
+    lo, hi = params["wiki"]["card_claim_range"]
+    n = len(card.claims)
+    if n < lo:
+        return [f"主張數 {n} 少於下限 {lo}：考慮與相鄰觀念合併，不要為了湊數硬加主張"]
+    if n > hi:
+        return [f"主張數 {n} 超過上限 {hi}：考慮拆卡，或刪掉重複與次要的主張"]
+    return []
+
+
 def main(argv: list[str]) -> int:
+    count_check = "--claim-count" in argv
+    argv = [a for a in argv if a != "--claim-count"]
     params = W.load_params()
     cards = [W.parse_card(Path(a)) for a in argv] if argv else W.load_all_cards()
     all_cards = W.load_all_cards()
@@ -159,6 +175,8 @@ def main(argv: list[str]) -> int:
         failed = True
     for card in cards:
         err, hint = check_card(card, all_ids, params, blogs)
+        if count_check:
+            err += check_claim_count(card, params)
         status = "FAIL" if err else "PASS"
         print(f"== {card.path.name}: {status}  (ERROR {len(err)}, HINT {len(hint)})")
         for e in err:

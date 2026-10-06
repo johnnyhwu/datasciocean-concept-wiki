@@ -10,7 +10,9 @@ stage1:
   reader_max_rounds: 5
   # 讀者要求修改後，改動的主張要補審對證者；這段補審另計，上限如下（超過就交給人）
   reader_edit_reaudit_max_rounds: 2
-  # 全文審查（整篇 blog 讀一次，審這篇的所有卡）：有 blocker 修完後最多再跑到第幾輪
+  # 全文審查（整篇 blog 讀一次，審這篇的所有卡）：有 blocker 修完後最多再跑到第幾輪。
+  # 第 2 輪仍有 blocker 時，撰寫者判斷是否跑第 3 輪並向人報告理由（見 review-loop.md 關卡 3）；
+  # blog 內部矛盾與跨卡矛盾一律交人。
   final_audit_max_rounds: 2
   blind_miner_enabled: false
   background_terms_file: config/background-terms.md
@@ -19,6 +21,9 @@ stage1:
   card_soft_limit: [5, 6]           # 單篇 blog 的觀念卡數量量級（軟上限，不是目標）
 
 wiki:
+  # 每張卡的主張數範圍（含 pending 主張）。只在「合併階段」用 validate_card.py --claim-count 檢查，
+  # 提案階段不看主張數（避免為了湊數把卡寫大）。見 mining-and-filtering.md。
+  card_claim_range: [10, 20]
   # 開放清單（docs/card-format.md §6）。新增類型時，必須同時在 datasciocean-social-media repo 的
   # references/anchor-writing-rules.md 定義 Stage 2 的寫法規則。
   anchor_types:

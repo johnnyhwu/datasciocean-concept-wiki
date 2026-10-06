@@ -103,6 +103,25 @@ for name, fn, expect in BAD:
 for cid, card in CARDS.items():
     check(f"validate 放行（測誤殺）：{cid}", not errors_of(card), errors_of(card)[:200])
 
+# ---------------------------------------------------------------- 1b. 主張數檢查（只在合併階段用 --claim-count）
+class _FakeCard:
+    def __init__(self, n: int) -> None:
+        self.claims = [{}] * n
+
+
+lo, hi = PARAMS["wiki"]["card_claim_range"]
+check("claim-count：低於下限 → 擋下", any("少於下限" in e for e in VC.check_claim_count(_FakeCard(lo - 1), PARAMS)))
+check("claim-count：高於上限 → 擋下", any("超過上限" in e for e in VC.check_claim_count(_FakeCard(hi + 1), PARAMS)))
+check("claim-count：下限與上限本身放行（測誤殺）", not VC.check_claim_count(_FakeCard(lo), PARAMS) and not VC.check_claim_count(_FakeCard(hi), PARAMS))
+_over = next((c for c in CARDS.values() if len(c.claims) > hi), None)
+if _over is not None:
+    with contextlib.redirect_stdout(io.StringIO()):
+        rc_default = VC.main([str(_over.path)])
+        rc_count = VC.main(["--claim-count", str(_over.path)])
+    check("claim-count：預設不檢查，加 --claim-count 才擋（旗標有接上）", rc_default == 0 and rc_count == 1)
+else:
+    check("claim-count：fixtures 內需有一張超過上限的卡來測旗標", False)
+
 # ---------------------------------------------------------------- 2. make_auditor_copy：每條引文都定位得到
 for cid, card in CARDS.items():
     blogs = [W.load_blog(s["article"], PARAMS) for s in card.front["sources"]]

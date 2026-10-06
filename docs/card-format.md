@@ -159,6 +159,7 @@ claims:
 - 含數字的主張必有 `comparison_target`，否則狀態必須是 `pending_author_confirmation`；例外：`numeric_kind: non_comparative` 搭配允許清單內的 `numeric_reason`，且主張不得含倍數、百分比、分數、價格寫法
 - `source_quotes` 與 `qualifiers[].source_quote` 不為空，且**逐字出現在 blog**、落在 `sources.sections` 列出的小節內
 - `author_confirmed` 必有 `confirmation.date`
+- （Stage 1 內部檢查，不屬於卡格式契約）`--claim-count`：每張卡主張數須在 `config/params.yaml` 的 `wiki.card_claim_range`（預設 10 到 20，含 pending 主張）。只在合併階段使用，提案階段不檢查
 
 逐字比對的正規化（`wikilib.normalize`）：NFKC 統一全半形、去掉 markdown 標記（粗體、表格線、標題與清單記號、連結語法、shortcode）、去掉引號字元、去掉所有空白。blog 與引文用同一個函式。引文裡的「…」把引文切成片段，每個片段都必須逐字出現且依序。
 
