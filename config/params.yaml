@@ -1,0 +1,52 @@
+# Stage 1 所有可調參數。腳本讀這份；改數字不用動程式。
+
+blog:
+  root: blog                        # submodule 路徑（每次工作前先 git submodule update --remote）
+  source_file: index.zh-tw.md       # 讀哪個語言版本
+
+stage1:
+  # 審查迴圈輪數上限（第一次實跑後與人討論：對證者與讀者各最多 5 輪，依序進行，不同時改）
+  auditor_max_rounds: 5
+  reader_max_rounds: 5
+  # 讀者要求修改後，改動的主張要補審對證者；這段補審另計，上限如下（超過就交給人）
+  reader_edit_reaudit_max_rounds: 2
+  # 全文審查（整篇 blog 讀一次，審這篇的所有卡）：有 blocker 修完後最多再跑到第幾輪
+  final_audit_max_rounds: 2
+  blind_miner_enabled: false
+  background_terms_file: config/background-terms.md
+  # 對證者看到的卡副本：paragraph＝引文加所在段落（預設）；quote＝只給引文（最省，但看不到前後句）
+  auditor_context: paragraph
+  card_soft_limit: [5, 6]           # 單篇 blog 的觀念卡數量量級（軟上限，不是目標）
+
+wiki:
+  # 開放清單（docs/card-format.md §6）。新增類型時，必須同時在 datasciocean-social-media repo 的
+  # references/anchor-writing-rules.md 定義 Stage 2 的寫法規則。
+  anchor_types:
+    - 實驗結果
+    - 設計參數
+    - 官方宣稱
+    - 第三方實測
+    - 數學推導
+    - 外部研究引用
+    - 原作者解讀
+    - 部落格推論
+    - 部落格考證
+    - 部落格判斷
+    - 背景說明
+    - 部落格舉例
+    - 社群評論
+  # 數字豁免：numeric_kind: non_comparative 必須搭配 numeric_reason
+  non_comparative_reasons:
+    - 規格上限
+    - 日期
+    - 示範題
+    - 定義
+    - 名稱
+    - 假設題設
+  # 含這些寫法的主張一律不得豁免（倍數、百分比、分數、價格）
+  comparative_number_patterns:
+    - '倍'
+    - '[%％]'
+    - '\d\s*分'
+    - '\d\s*[xX](?!\s*[\w+\-=*/^])'   # 25x 是倍數；3x + 5 是方程式（× 是乘號，不算）
+    - '\$\s*\d'

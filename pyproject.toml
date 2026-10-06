@@ -1,0 +1,13 @@
+[project]
+name = "datasciocean-concept-wiki"
+version = "0.2.0"
+description = "DataSci Ocean blog -> concept wiki（Stage 1：從 blog 提煉觀念卡）"
+requires-python = ">=3.9"
+dependencies = [
+    "pyyaml>=6",
+]
+
+[tool.uv]
+# 所有 uv 資源都留在 repo 內，不污染本機
+cache-dir = ".uv-cache"
+package = false
