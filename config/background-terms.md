@@ -53,6 +53,18 @@
 - logit（模型輸出的原始分數）
 - 信賴區間（confidence interval）
 
+**第三次實跑（skillopt）後經人確認加入**
+- 過擬合（overfitting）
+- 訓練集／驗證集／測試集（train / validation / test split）
+- epoch
+- checkpoint
+- learning rate（學習率）
+- gradient（梯度）
+- 前沿模型（frontier model）
+- LLM-as-judge
+
+（Rollout、minibatch、MapReduce、EMA 沒加：卡上直接取 blog 的解釋來定義。）
+
 ## 刻意不放的詞（需要在卡上解釋）
 
 - RLHF、RLVR、reward model、proper scoring rule、KV cache、constrained decoding、Bradley-Terry
