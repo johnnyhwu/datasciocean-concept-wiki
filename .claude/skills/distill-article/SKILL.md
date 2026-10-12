@@ -22,6 +22,8 @@ description: 把 DataSci Ocean 的一篇 blog 文章提煉成觀念卡（Stage 1
  → [8] 全文審查（每篇一次）→ [9] 去重與關係 → [10] 放行、寫入 wiki、更新 index
 ```
 
+**卡檔案放哪**：寫卡時就放在 `wiki/concepts/<id>.md`（不 commit；`validate_card.py` 要在這裡檢查 `related`），審查期間它就在那裡。「寫入 wiki」指全部通過後重建 `wiki/index.md` 並更新 `docs/status.md`，不是移動檔案；有待人處理的項目時，index 與 status 等人回覆後才更新。
+
 審查**依序**進行，不同時改：對證者先把卡的每條主張對到原文，通過後才給讀者，讀者通過後才做全文審查。任何一關讓卡的主張變動，後面的關要重來（只重審改動的主張，見 `references/review-loop.md`）。
 
 **併卡一律在審查開始前完成。** 提案確認、卡寫完、主張數檢查通過之後才進 [6]；審查開始後不再併卡（審完才併，審查就白做了）。
@@ -43,8 +45,8 @@ description: 把 DataSci Ocean 的一篇 blog 文章提煉成觀念卡（Stage 1
 
 - **寫卡前的提案清單**（哪些觀念要寫、哪些合併或淘汰），人確認後才寫卡。
 - 去重與關係提議（重複、實例、相關、全新）。
-- blog 內部矛盾怎麼處理（預設：不修 blog，卡用保守寫法，有矛盾的主張標 `pending_author_confirmation`）。
-- 背景詞清單以外、blog 也沒解釋的「通用知識」詞。
+- blog 內部矛盾怎麼處理（預設：不修 blog；審查者列出的矛盾，包含措辭層級的，相關主張一律先標 `pending_author_confirmation`，再列給人決定要不要改回）。
+- 背景詞清單以外、blog 也沒解釋、且**不是很基本**的「通用知識」詞（很基本的詞由撰寫者補在卡的「名詞補充」小節，不必問，見 `references/card-writing.md` §7）。
 - 審查者與撰寫者的爭議條目（撰寫者不能反駁審查者，只能標爭議）。
 - 輪數用完仍有 blocker。
 - 新增或變動的 `pending_author_confirmation` 主張；任何 `author_confirmed`。
@@ -59,7 +61,7 @@ description: 把 DataSci Ocean 的一篇 blog 文章提煉成觀念卡（Stage 1
 | `make_auditor_copy.py` | 產生對證者版卡：主張後標 [n]，卡尾參考文獻與引文所在段落（`--only` 只審改動的主張） |
 | `verify_audit.py` | 驗證對證者 JSON：引用逐字、分級（blocker 與 minor）、pending 不擋 |
 | `claim_fingerprints.py` | 主張指紋：`save` 存已通過的、`diff` 列出新增或改過的 |
-| `make_reader_copy.py` | 產生讀者版卡（移除引用與參考文獻） |
+| `make_reader_copy.py` | 產生讀者版卡（移除引用與參考文獻；卡有「名詞補充」小節時原樣附在末尾） |
 | `verify_reader.py` | 驗證讀者 JSON：主軸三題都要有卡上引用；陷阱題可答「卡上沒寫」，其餘不行 |
 | `verify_final_audit.py` | 驗證全文審查 JSON：斷章取義、限定條件掉了、跨卡矛盾、blog 矛盾 |
 | `build_index.py` | 產生 `wiki/index.md`（程式產生，不手改） |

@@ -14,7 +14,6 @@ stage1:
   # 第 2 輪仍有 blocker 時，撰寫者判斷是否跑第 3 輪並向人報告理由（見 review-loop.md 關卡 3）；
   # blog 內部矛盾與跨卡矛盾一律交人。
   final_audit_max_rounds: 2
-  blind_miner_enabled: false
   background_terms_file: config/background-terms.md
   # 對證者看到的卡副本：paragraph＝引文加所在段落（預設）；quote＝只給引文（最省，但看不到前後句）
   auditor_context: paragraph
@@ -48,6 +47,15 @@ wiki:
     - 定義
     - 名稱
     - 假設題設
+    - 計數
+  # 名稱類的標籤數字（Stage 3、D2S、第 3 點、挑戰 5、§1…）不算「含數字」：檢查前先從主張文字刪掉。
+  # 「計數」理由只給樣本數、人數、篇數、個數這類單純的數量；倍數、百分比、分數、價格仍不得豁免。
+  numeric_label_patterns:
+    - '(?i)Stage\s*\d+'
+    - '第\s*\d+\s*[點章節題條步輪]'
+    - '挑戰\s*\d+'
+    - '§\s*\d+'
+    - '\b[A-Za-z]+\d+[A-Za-z]*\b'   # D2S、T5 這類名稱
   # 含這些寫法的主張一律不得豁免（倍數、百分比、分數、價格）
   comparative_number_patterns:
     - '倍'

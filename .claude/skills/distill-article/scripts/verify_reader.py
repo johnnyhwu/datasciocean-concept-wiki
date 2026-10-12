@@ -5,6 +5,7 @@
         只有陷阱題可以答「卡上沒寫」；其他題答「沒寫」代表讀者漏看，算失敗。
 - 主軸三題（論點、機制、證據）每題都要有「卡上真的存在」的引用；沒有就退回。答「卡上沒有」本身不通過主軸。
 - 只能從卡回答的題目：答案不是「卡上沒寫」就必須有有效引用，否則算硬答，退回。
+  答案以「卡上沒寫」開頭，或沒有任何有效引用卻含「卡上沒有」，才算答沒寫；有引用的完整作答不算。
 - 名詞問題只列為建議；blocks_core=true 的算退回。
 結束碼：0 通過、1 退回。
 """
@@ -55,7 +56,9 @@ def main(copy_path: str, reader_path: str, traps: list[int] | None = None) -> in
     for i, q in enumerate(qs, 1):
         ans = q.get("answer", "")
         ok, bad = valid_cites(q.get("citations"))
-        said_none = any(n in ans for n in NO_ANSWER)
+        # 答案以「卡上沒寫」開頭，或整句沒有任何有效引用卻含「卡上沒有」，才算答沒寫；
+        # 有引用的完整作答（只是順帶寫「卡上沒有說明某細節」）不算（第四次實跑的誤判）。
+        said_none = ans.strip().startswith(NO_ANSWER) or (any(n in ans for n in NO_ANSWER) and ok == 0)
         if i in trap_set:
             if not said_none:
                 rejects.append(f"陷阱題硬答：{q.get('q','')[:40]}｜答：{ans[:50]}")

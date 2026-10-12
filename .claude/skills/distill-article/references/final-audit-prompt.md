@@ -10,7 +10,7 @@
 
 只准讀這些檔案，不准讀其他檔案、不准上網、不准用你自己的背景知識判斷對錯：
 - blog 原文：{BLOG_PATH}（唯一真相來源）
-- 觀念卡：{CARD_PATHS}（只看 frontmatter 的 title 與 claims）
+- 觀念卡：{CARD_PATHS}（只看 frontmatter 的 title 與 claims；卡末尾若有「名詞補充」小節，那是撰寫者補充的通用知識，不是主張，不必審）
 
 ## 檢查項目（只用下列類別字串）
 

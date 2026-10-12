@@ -1,8 +1,8 @@
 """Stage 1 程式檢查的回歸測試：故意做壞的卡，程式必須抓到；正確的卡必須通過（測誤殺）。
 
 用法（repo 根目錄）：uv run python tests/test_stage1_programs.py
-範圍：validate_card（結構與逐字比對）、make_auditor_copy（引文都能定位）、verify_audit 與
-verify_final_audit（分級規則）。審查者（subagent）本身的嚴格度不在這裡測，見
+範圍：validate_card（結構與逐字比對）、make_auditor_copy（引文都能定位）、make_reader_copy、verify_reader、
+verify_audit 與 verify_final_audit（分級規則）。審查者（subagent）本身的嚴格度不在這裡測，見
 .claude/skills/distill-article/references/regression-tests.md。
 修改任何程式檢查或審查流程後，要重跑這份。
 """
@@ -23,9 +23,11 @@ os.environ["DSO_CARDS_DIR"] = str(ROOT / "tests" / "fixtures" / "concepts")
 sys.path.insert(0, str(ROOT / ".claude/skills/distill-article/scripts"))
 
 import make_auditor_copy as MAC  # noqa: E402
+import make_reader_copy as MRC  # noqa: E402
 import validate_card as VC  # noqa: E402
 import verify_audit as VA  # noqa: E402
 import verify_final_audit as VF  # noqa: E402
+import verify_reader as VR  # noqa: E402
 import wikilib as W  # noqa: E402
 
 PARAMS = W.load_params()
@@ -241,6 +243,88 @@ rc, _ = run_final({**base, "cross_card_conflicts": [{"items": [], "note": "x"}]}
 check("final audit：跨卡矛盾 → 交人裁決（exit 2）", rc == 2)
 rc, _ = run_final({**base, "blog_internal_contradictions": [{"description": "x", "quotes": [REAL_Q], "related": []}]})
 check("final audit：blog 內部矛盾 → 交人裁決（exit 2）", rc == 2)
+
+
+# ---------------------------------------------------------------- 5. 數字檢查：名稱標籤與「計數」豁免（第四次實跑）
+def label_claim(c: W.Card) -> None:
+    x = claim(c, "c1")
+    x["text"] = "Stage 3 與 D2S 的第 2 點，挑戰 5 見 §1"
+    x.pop("comparison_target", None)
+    x.pop("numeric_kind", None)
+
+
+def label_with_ratio(c: W.Card) -> None:
+    x = claim(c, "c1")
+    x["text"] = "Stage 3 快 25 倍"
+    x.pop("comparison_target", None)
+    x.pop("numeric_kind", None)
+
+
+def count_claim(c: W.Card) -> None:
+    x = claim(c, "c1")
+    x["text"] = "訓練樣本有 80 筆"
+    x.update(numeric_kind="non_comparative", numeric_reason="計數")
+    x.pop("comparison_target", None)
+
+
+def count_with_ratio(c: W.Card) -> None:
+    x = claim(c, "c1")
+    x["text"] = "訓練樣本有 80 筆，快 25 倍"
+    x.update(numeric_kind="non_comparative", numeric_reason="計數")
+    x.pop("comparison_target", None)
+
+
+check("數字檢查：Stage 3、D2S、第 2 點、挑戰 5、§1 這類名稱標籤不算含數字（測誤殺）",
+      "沒有 comparison_target" not in errors_of(mutated(label_claim)))
+check("數字檢查：名稱標籤旁邊有倍數仍擋下", "沒有 comparison_target" in errors_of(mutated(label_with_ratio)))
+e = errors_of(mutated(count_claim))
+check("數字檢查：「計數」豁免放行（測誤殺）", "不在允許清單" not in e and "比較性" not in e and "沒有 comparison_target" not in e)
+check("數字檢查：「計數」豁免含倍數仍擋下", "比較性數字寫法" in errors_of(mutated(count_with_ratio)))
+
+
+# ---------------------------------------------------------------- 6. make_reader_copy 與 verify_reader
+def reader_copy_text(extra: str = "") -> str:
+    with tempfile.TemporaryDirectory() as d:
+        src = Path(d) / "card.md"
+        src.write_text(GOOD.path.read_text(encoding="utf-8") + extra, encoding="utf-8")
+        out = Path(d) / "reader.md"
+        MRC.main(str(src), str(out))
+        return out.read_text(encoding="utf-8")
+
+
+NOTES = "\n## 名詞補充（通用知識，非 blog 內容）\n\n- **recall**：所有真正相關的內容中，被找出來的比例。\n"
+t = reader_copy_text(NOTES)
+check("make_reader_copy：附上「名詞補充」小節", "名詞補充" in t and "被找出來的比例" in t)
+check("make_reader_copy：仍不洩漏引文與參考文獻", "source_quotes" not in t and "source_quote" not in t)
+check("make_reader_copy：沒有名詞補充的卡不多出內容", "名詞補充" not in reader_copy_text())
+
+
+def run_reader(qa: list[tuple[str, str, list]], traps=None) -> tuple[int, str]:
+    with tempfile.TemporaryDirectory() as d:
+        copy_p = Path(d) / "reader.md"
+        MRC.main(str(GOOD.path), str(copy_p))
+        q1 = claim(GOOD, "c1")["text"]
+        cite = [{"claim_id": "c1", "quote": q1}]
+        data = {"card_id": GOOD.front["id"],
+                "core": {k: {"answer": "x", "citations": cite} for k in ("thesis", "mechanism", "evidence")},
+                "terms": [],
+                "card_only_questions": [{"q": q, "answer": a, "citations": (cite if use else [])} for q, a, use in qa]}
+        p = Path(d) / "r.json"
+        p.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc = VR.main(str(copy_p), str(p), traps)
+        return rc, buf.getvalue()
+
+
+rc, _ = run_reader([("題一", "有答案", True), ("陷阱", "卡上沒寫", False)], [2])
+check("verify_reader：有引用作答、陷阱題答沒寫 → 通過", rc == 0)
+rc, _ = run_reader([("題一", "答案如下。另外卡上沒有說明某個細節。", True), ("陷阱", "卡上沒寫", False)], [2])
+check("verify_reader：有引用的完整作答，順帶寫「卡上沒有說明…」→ 通過（測誤殺）", rc == 0)
+rc, out = run_reader([("題一", "卡上沒寫", False), ("陷阱", "卡上沒寫", False)], [2])
+check("verify_reader：專屬題答「卡上沒寫」→ 漏看，退回", rc == 1 and "漏看" in out)
+rc, out = run_reader([("題一", "有答案", True), ("陷阱", "硬答一個", False)], [2])
+check("verify_reader：陷阱題硬答 → 退回", rc == 1 and "陷阱題硬答" in out)
 
 print(f"\n{'全部通過' if not fails else f'{len(fails)} 項失敗：' + '; '.join(fails)}")
 sys.exit(1 if fails else 0)

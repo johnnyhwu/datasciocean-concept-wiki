@@ -108,6 +108,9 @@ def check_card(card: W.Card, all_ids: set[str], params: dict, blogs: dict) -> tu
 
         # 含數字必有 comparison_target（否則必須是 pending）
         text = str(c.get("text", ""))
+        # 名稱類標籤數字（Stage 3、D2S、第 3 點…）不算「含數字」，檢查前先刪掉（params.yaml: numeric_label_patterns）
+        for pat in params["wiki"].get("numeric_label_patterns", []):
+            text = re.sub(pat, "", text)
         if re.search(r"\d", text) and not c.get("comparison_target"):
             if c.get("numeric_kind") == "non_comparative":
                 reason = c.get("numeric_reason")

@@ -71,6 +71,10 @@ claims:
 ```
 ```
 
+### 3.0 claims 區塊以外的內容
+
+程式只讀 frontmatter 與 `claims` 區塊，區塊外的文字自由。Stage 1 用它放 `## 名詞補充（通用知識，非 blog 內容）` 小節：撰寫者以一般知識補充的很基本的名詞（如 temperature、recall）。這個小節**不是主張**：沒有 `source_quotes`、不經對證者審查、不能當作 blog 的說法引用。Stage 2 可以不讀它；若要用，必須自行標明它不是 blog 內容。
+
 ### 3.1 context_type（下游決定「脈絡」怎麼寫）
 
 | 值 | 意思 | 例子 |
@@ -89,7 +93,7 @@ claims:
 | `source_quotes` | 是 | 從 blog 逐字複製的原文，可多段。可用「…」省略中間，每個片段都必須逐字且依序出現 |
 | `anchor_type` | 是 | 見 §6，開放清單 |
 | `comparison_target` | 含數字時必填 | 這個數字是跟誰比的。blog 沒寫就留空並標 `pending_author_confirmation`，或不使用 |
-| `numeric_kind` / `numeric_reason` | 否 | 含數字但不是比較數字時，標 `numeric_kind: non_comparative` 並寫 `numeric_reason`（規格上限、日期、示範題、定義、名稱、假設題設），免填 `comparison_target`。**倍數、百分比、分數、價格不得豁免。** 所有豁免都會列給審查者逐條確認 |
+| `numeric_kind` / `numeric_reason` | 否 | 含數字但不是比較數字時，標 `numeric_kind: non_comparative` 並寫 `numeric_reason`（規格上限、日期、示範題、定義、名稱、假設題設、計數），免填 `comparison_target`。**倍數、百分比、分數、價格不得豁免。** 名稱類標籤數字（Stage 3、D2S、第 3 點、挑戰 5、§1）不算含數字，程式自動略過。所有豁免都會列給審查者逐條確認 |
 | `qualifiers` | 否 | 綁在這條主張上的限定條件，每項含 `text` 與 `source_quote`。**使用這條主張的下游內容必須同時帶出它的限定條件** |
 | `importance` | 是 | 數字越小越重要（thesis 必為 1）。下游依此由上往下取子集 |
 | `status` | 是 | `normal`、`pending_author_confirmation`、`author_confirmed` |

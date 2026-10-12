@@ -8,7 +8,7 @@
 uv run python tests/test_stage1_programs.py
 ```
 
-共 54 項，涵蓋：
+共 65 項，涵蓋：
 
 | 範圍 | 測什麼 |
 |---|---|
@@ -17,6 +17,8 @@ uv run python tests/test_stage1_programs.py
 | `validate_card` 放行（測誤殺） | `tests/fixtures/concepts/` 的每一張卡都必須通過（這是第一次實跑的 6 張卡，留作測試資料，不屬於真實觀念庫） |
 | `make_auditor_copy` | 每條引文都能定位到段落；`--only` 只列其他主張文字；quote 模式沒有段落；不洩漏 url |
 | `verify_audit` | 全部完全支持通過；不支持、數字對不上、漏審擋下；措辭不同、部分支持、審查者捏造引用、其他錨點邊界、pending 主張的問題只記錄；卡標官方宣稱而錨點被判不支持擋下；`--copy` 越界讀 blog 列備註 |
+| `validate_card` 數字檢查 | 名稱標籤（Stage 3、D2S、第 2 點、挑戰 5、§1）不算含數字；標籤旁有倍數仍擋下；「計數」豁免放行、含倍數仍擋下 |
+| `make_reader_copy`／`verify_reader` | 附上「名詞補充」小節、仍不洩漏引文；有引用的完整作答（順帶寫「卡上沒有說明…」）通過；專屬題答「卡上沒寫」判漏看；陷阱題硬答退回 |
 | `verify_final_audit` | 沒發現通過；斷章取義擋下；審查者引用不逐字、pending、卡漏掉重點只記錄；跨卡矛盾與 blog 矛盾 exit 2 |
 
 ## 2. 審查者層（subagent，尚未自動化）

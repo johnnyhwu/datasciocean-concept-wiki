@@ -5,11 +5,14 @@
 拿掉：sources（url、小節名）、source_quotes 與 qualifiers 的 source_quote（引用與參考文獻）、
       numeric_kind／numeric_reason／confirmation 等內部欄位。
 讀者只能引用主張的 text 與限定條件的 text。
+卡檔案若在 claims 區塊外有「## 名詞補充」小節（撰寫者以通用知識補充的基本名詞，不是主張），原樣附在副本末尾：
+那是卡的一部分，讀者看得到才能判斷名詞有沒有被解釋。
 
 用法：uv run python .claude/skills/distill-article/scripts/make_reader_copy.py <card.md> <out.md>
 """
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -34,6 +37,10 @@ def main(card_path: str, out_path: str) -> None:
         + yaml.safe_dump({"card": front, "claims": claims}, allow_unicode=True, sort_keys=False)
         + "```\n"
     )
+    raw = Path(card_path).read_text(encoding="utf-8")
+    m = re.search(r"^## 名詞補充.*", raw, re.M | re.S)
+    if m:
+        text += "\n" + m.group(0).rstrip() + "\n"
     Path(out_path).write_text(text, encoding="utf-8")
 
 
