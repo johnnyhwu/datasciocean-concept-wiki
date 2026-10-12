@@ -120,7 +120,7 @@ claims:
       - '讀取檔案或執行測試在幾乎所有模式下都會被自動核准，因為就算判斷錯了，代價也很低。'
     anchor_type: 設計參數
     importance: 12
-    status: pending_author_confirmation
+    status: normal
   - id: c13
     role: mechanism
     text: '強制推送(force-push)、刪除分支、rm -rf 這類動作，在任何模式下預設都需要明確確認，因為事後可能根本無法復原'

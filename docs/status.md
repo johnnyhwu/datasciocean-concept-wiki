@@ -8,7 +8,7 @@
   - `jev-as-a-judge`（2026-10-06，第二次實跑）：5 張。
   - `skillopt`（2026-10-10，第三次實跑）：5 張（`skillopt-overview`、`skillopt-batch-evidence-minibatch`、`skillopt-bounded-edit-budget`、`skillopt-blind-acceptance-gate`、`skillopt-epoch-level-control`），2 條 pending（概覽卡 c9、編輯預算卡 c4）。
   - `persona-aware-d2s`（2026-10-12，第四次實跑）：5 張（`persona-d2s-task-and-pipeline`、`persona-d2s-training-design-flaws`、`persona-d2s-what-to-borrow`、`decision-transformer-reward-conditioning`、`bradley-terry-pairwise-preference`），5 條 pending（Bradley-Terry 卡 c11：blog 算 2.53，重算為 2.58；what-to-borrow 卡 c3、c10：blog 稱「高 recall」但 recall 只有 78.89%；what-to-borrow 卡 c16 與 training-design-flaws 卡 c15：blog 對摘要重排證據「紮實」與「統計效力偏低」前後不一）。Decision Transformer 與 Bradley-Terry 是 `standalone_classic`。
-  - `claude-code`（2026-10-12，第五次實跑；ai-concept 概念解說型文章，無實驗數字）：3 張（`claude-code-agentic-loop-and-tools` 18 條、`claude-code-extension-and-context` 20 條、`claude-code-permission-blast-radius` 15 條），7 條 pending（loop 卡 c12、c15、c16：blog 稱「精簡的通用工具」又要「優先專用、窄用途工具」；權限卡 c9、c12、c13：「完全自主執行」模式 vs「任何模式下」危險動作預設要確認、「幾乎所有模式」自動核准 vs「每個非瑣碎動作都先詢問」；擴充卡 c16：CLAUDE.md 稱「專案層級記憶」又說扮演「Org-level」記憶層）。提案階段 5 張，人同意後併成 3 張。同篇三張卡互設 `related`。
+  - `claude-code`（2026-10-12，第五次實跑；ai-concept 概念解說型文章，無實驗數字）：3 張（`claude-code-agentic-loop-and-tools` 18 條、`claude-code-extension-and-context` 20 條、`claude-code-permission-blast-radius` 15 條），5 條 pending（loop 卡 c12、c15、c16：blog 稱「精簡的通用工具」又要「優先專用、窄用途工具」；權限卡 c9、c13：「完全自主執行」模式 vs「任何模式下」危險動作預設要確認）。擴充卡 c16（CLAUDE.md 稱「專案層級」又說「Org-level」）與權限卡 c12（讀檔「幾乎所有模式」自動核准 vs「每個非瑣碎動作都先詢問」）經人檢視後改回 normal（2026-10-12）。提案階段 5 張，人同意後併成 3 張。同篇三張卡互設 `related`。
 - 第一次實跑的 6 張卡（`jev-overview`）留在 `tests/fixtures/concepts/` 當測試資料，完整歷史在 git。
 
 ## 流程現況

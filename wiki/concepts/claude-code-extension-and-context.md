@@ -161,7 +161,7 @@ claims:
       - '持久、共享，且不依附於任何單一對話'
     anchor_type: 設計參數
     importance: 16
-    status: pending_author_confirmation
+    status: normal
   - id: c17
     role: mechanism
     text: '長時間的 session 終究會逼近 context window 的上限。Claude Code 不會盲目截斷，而是把較早的對話摘要成精簡版本後繼續工作——對話得以延續，使用者不需要重啟或重新解釋先前的決策'
