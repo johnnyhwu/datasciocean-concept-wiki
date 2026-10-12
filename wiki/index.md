@@ -5,6 +5,9 @@
 | bradley-terry-pairwise-preference | Bradley-Terry model 的核心假設是每個項目都有一個看不見的「實力值」，而比較結果只是這個實力值的機率反映，不是絕對保證；它是 RLHF 領域最廣泛採用的偏好模型 | - | persona-d2s-training-design-flaws, decision-transformer-reward-conditioning | active |
 | cascade-complementary-errors | 這個串接設計能成立的前提，是兩個判官錯在不同的題：如果第一階段錯的題，強判官大多答對，轉出去就能補回來；但兩邊都錯的題，怎麼轉都修不回來 | - | jev-cascade-overview | active |
 | cascade-threshold-and-failure-mode | 串接的門檻 τ 是第一階段判官、強判官、任務三者的函數，換任何一個都要用自己的標註資料重選；門檻選對時，好的串接設計失敗時是把成本推高，而不是把錯誤放行 | - | jev-cascade-overview | active |
+| claude-code-agentic-loop-and-tools | Claude Code 以 CLI(以及 SDK)行程的形式運作，其核心其實只有一個原語：一個能呼叫工具、觀察結果、並決定下一步該做什麼的 LLM——如此反覆，直到它自己判斷任務已經完成 | - | claude-code-extension-and-context, claude-code-permission-blast-radius | active |
+| claude-code-extension-and-context | Claude Code 的摘要、範圍化委派、專案設定檔這三個機制單獨拿出來看都不算新穎，真正讓它們成為「Harness」而非單純「功能」的，是它們能自動彼此組合；結語也說，包含 Skills、Hooks、MCP 在內的這些機制單獨拿出來看都不算特殊技術，真正讓它能運作的，是它們被設計成可以彼此組合 | - | claude-code-agentic-loop-and-tools, claude-code-permission-blast-radius | active |
+| claude-code-permission-blast-radius | 一個能無人看管地執行任意 shell 指令、修改檔案的 Agent，需要一層不能單純仰賴模型「每次都猜對」的安全機制；目標不是讓 Agent 完全不可能犯錯，而是讓犯錯的代價變得低廉且可逆，使迴圈得以持續運作，而不需要人類在每一次失誤時都出手介入 | - | claude-code-agentic-loop-and-tools, claude-code-extension-and-context | active |
 | confidence-three-metrics | 評估一個會給信心的分類器，要分三件事看：準確度看判決對不對；AUROC 只看 q 的順序；Brier 與 NLL 看 q 的數字大小；而溫度縮放（一種校準）只動數字這一件，二選一時不動排序與判決 | - | jev-cascade-overview | active |
 | decision-transformer-reward-conditioning | Decision Transformer 的提案是把強化學習（RL）問題重新包裝成序列預測問題，用 GPT 式的監督學習訓練，完全不估計價值函數、不做 bootstrapping；訓練時是「觀察別人怎麼走、最後拿多少分，學會兩者的關聯」，使用時是「你先設定想要的分數，模型回推該怎麼走」 | - | persona-d2s-training-design-flaws, bradley-terry-pairwise-preference | active |
 | jev-cascade-overview | 用 JEV 的最大標籤機率 q 當信心，沿著「有把握就採用、沒把握就轉給 GPT-6」分流，在答案能從文字讀出的任務上又準又省，在難任務與新任務上，門檻選對時準確度不掉、但省得有限 | - | confidence-three-metrics, cascade-complementary-errors, judge-readable-vs-derive, cascade-threshold-and-failure-mode | active |
