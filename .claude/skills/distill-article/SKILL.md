@@ -45,7 +45,7 @@ description: 把 DataSci Ocean 的一篇 blog 文章提煉成觀念卡（Stage 1
 
 - **寫卡前的提案清單**（哪些觀念要寫、哪些合併或淘汰），人確認後才寫卡。
 - 去重與關係提議（重複、實例、相關、全新）。
-- blog 內部矛盾怎麼處理（預設：不修 blog；審查者列出的矛盾，包含措辭層級的，相關主張一律先標 `pending_author_confirmation`，再列給人決定要不要改回）。
+- blog 內部矛盾怎麼處理（預設：不修 blog；審查者列出的真矛盾（數字、事實對不上）相關主張先標 `pending_author_confirmation`；只是措辭瑕疵、讀 blog 說得通的，由撰寫者用限定條件 resolve，細節見 `card-writing.md` §10；兩者都列給人可推翻）。
 - 背景詞清單以外、blog 也沒解釋、且**不是很基本**的「通用知識」詞（很基本的詞由撰寫者補在卡的「名詞補充」小節，不必問，見 `references/card-writing.md` §7）。
 - 審查者與撰寫者的爭議條目（撰寫者不能反駁審查者，只能標爭議）。
 - 輪數用完仍有 blocker。

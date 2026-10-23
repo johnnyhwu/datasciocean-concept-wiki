@@ -22,7 +22,7 @@
   - 輪數用完仍有 blocker、
   - 新增或變動的 `pending_author_confirmation`、任何 `author_confirmed`、
   - 全文審查的「交人裁決」項目（跨卡矛盾、blog 內部矛盾）。
-- 有上列任何一項：先把這些項目整理成一份簡短清單問人，人回覆後再寫入。卡檔案此時已在 `wiki/concepts/`（未 commit）；這裡的「寫入」指人回覆後重建 index 並更新 `docs/status.md`。blog 內部矛盾（含審查者列出的措辭層級張力）不必等人回覆，先把相關主張標 pending，清單裡列出供人改回。
+- 有上列任何一項：先把這些項目整理成一份簡短清單問人，人回覆後再寫入。卡檔案此時已在 `wiki/concepts/`（未 commit）；這裡的「寫入」指人回覆後重建 index 並更新 `docs/status.md`。blog 內部矛盾不必等人回覆：真矛盾先標 pending；措辭瑕疵由撰寫者用限定條件 resolve（見 `card-writing.md` §10），兩者都在清單裡列出供人推翻。
 - 寫入前最後跑一次 `validate_card.py`（全部卡）與 `build_index.py`。
 - 人確認的通用知識詞，若是一般性詞彙，加進 `config/background-terms.md`；MTok、rubric 這類在卡上只是引文單位或名稱標籤的，不加。
 
