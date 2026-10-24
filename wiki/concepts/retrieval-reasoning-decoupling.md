@@ -19,6 +19,7 @@ parent: null
 related:
   - rag-planner-single-round-vs-agentic
   - rag-narrow-waist
+  - sag-sql-vector-llm-division-and-funnel
 status: active
 ---
 
