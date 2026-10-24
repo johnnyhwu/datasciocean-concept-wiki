@@ -26,7 +26,8 @@ def main(final_path: str, card_paths: list[str]) -> int:
     params = W.load_params()
     cards = {W.parse_card(Path(p)).front["id"]: W.parse_card(Path(p)) for p in card_paths}
     slugs = sorted({s["article"] for c in cards.values() for s in c.front.get("sources", [])})
-    norms = [W.load_blog(s, params).full_norm for s in slugs]
+    _blogs = [W.load_blog(s, params) for s in slugs]
+    norms = [b.full_norm for b in _blogs] + [c for b in _blogs for c in b.captions_norm]  # 圖說也算 blog 原文（審查者可能引用）
     data = json.loads(Path(final_path).read_text(encoding="utf-8"))
 
     def in_blog(q: str) -> bool:

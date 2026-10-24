@@ -17,12 +17,15 @@ stage1:
   background_terms_file: config/background-terms.md
   # 對證者看到的卡副本：paragraph＝引文加所在段落（預設）；quote＝只給引文（最省，但看不到前後句）
   auditor_context: paragraph
-  card_soft_limit: [5, 6]           # 單篇 blog 的觀念卡數量量級（軟上限，不是目標）
 
 wiki:
   # 每張卡的主張數範圍（含 pending 主張）。只在「合併階段」用 validate_card.py --claim-count 檢查，
   # 提案階段不看主張數（避免為了湊數把卡寫大）。見 mining-and-filtering.md。
   card_claim_range: [10, 20]
+  # 主張可附的參考圖（docs/card-format.md §4.2）：每條主張張數上限、副檔名白名單、單檔大小上限（KB）
+  figure_max_per_claim: 2
+  figure_extensions: [.png, .jpg, .jpeg, .webp, .gif, .svg]
+  figure_max_kb: 2000
   # 開放清單（docs/card-format.md §6）。新增類型時，必須同時在 datasciocean-social-media repo 的
   # references/anchor-writing-rules.md 定義 Stage 2 的寫法規則。
   anchor_types:
@@ -52,6 +55,7 @@ wiki:
   # 「計數」理由只給樣本數、人數、篇數、個數這類單純的數量；倍數、百分比、分數、價格仍不得豁免。
   numeric_label_patterns:
     - '(?i)Stage\s*\d+'
+    - '(?i)Step\s*\d+'
     - '第\s*\d+\s*[點章節題條步輪]'
     - '挑戰\s*\d+'
     - '§\s*\d+'

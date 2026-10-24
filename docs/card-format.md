@@ -8,10 +8,11 @@
 |---|---|
 | 解耦 | 卡只放「觀念本身」，不放任何發布格式、貼文狀態、系列的欄位。這些屬於 Stage 2 repo。新增 Reels、Shorts 都不用改卡 |
 | 卡是上限 | 下游的內容是卡的子集，不得加入卡上沒有的判斷、數字、缺席型主張 |
+| 圖是參考 | 主張可附 blog 的圖，但圖不是證據：主張的依據永遠是 blog 的文字。圖只供下游理解與參考，貼文要用就必須重製（§4.2） |
 | 唯一來源 | 卡上所有內容只能來自 blog。模型自己的背景知識不得混進卡 |
 | 單向 | 下游不會把問題退回 Stage 1，也不修改卡 |
 | 多對多 | 一個觀念可來自多篇文章；一篇文章可提煉多個觀念 |
-| 純文字 | markdown 加 YAML，人看得懂、git 可追版本、Claude Code 可直接讀寫 |
+| 純文字 | markdown 加 YAML，人看得懂、git 可追版本、Claude Code 可直接讀寫。唯一的非文字檔是主張附的參考圖 |
 
 ## 2. 目錄結構
 
@@ -19,6 +20,7 @@
 wiki/
   index.md                    每個觀念一行：id、一句話論點、parent、related、status（程式產生，不手改）
   concepts/<concept-id>.md    觀念卡
+  figures/<article>/<檔名>    主張附的參考圖（從 blog 複製，§4.2）
 config/
   params.yaml                 Stage 1 的所有可調參數
   background-terms.md         背景詞清單（人維護）
@@ -94,7 +96,8 @@ claims:
 | `anchor_type` | 是 | 見 §6，開放清單 |
 | `comparison_target` | 含數字時必填 | 這個數字是跟誰比的。blog 沒寫就留空並標 `pending_author_confirmation`，或不使用 |
 | `numeric_kind` / `numeric_reason` | 否 | 含數字但不是比較數字時，標 `numeric_kind: non_comparative` 並寫 `numeric_reason`（規格上限、日期、示範題、定義、名稱、假設題設、計數），免填 `comparison_target`。**倍數、百分比、分數、價格不得豁免。** 名稱類標籤數字（Stage 3、D2S、第 3 點、挑戰 5、§1）不算含數字，程式自動略過。所有豁免都會列給審查者逐條確認 |
-| `qualifiers` | 否 | 綁在這條主張上的限定條件，每項含 `text` 與 `source_quote`。**使用這條主張的下游內容必須同時帶出它的限定條件** |
+| `qualifiers` | 否 | 綁在這條主張上的限定條件，每項含 `text` 與 `source_quote`；範圍、資料集、設定這類限定若只在 blog 圖說，可加 `source: figure_caption`，引文取自這條主張自己附圖的圖說（§4.2）。**使用這條主張的下游內容必須同時帶出它的限定條件** |
+| `figures` | 否 | 主張附的參考圖，見 §4.2 |
 | `importance` | 是 | 數字越小越重要（thesis 必為 1）。下游依此由上往下取子集 |
 | `status` | 是 | `normal`、`pending_author_confirmation`、`author_confirmed` |
 | `confirmation` | status 為 author_confirmed 時必填 | `date` 與 `note`（已知疑慮） |
@@ -111,6 +114,49 @@ claims:
 | `normal` | 通過審查 | 可用 |
 | `pending_author_confirmation` | 主張有疑慮（多半是 blog 自己前後矛盾），等作者決定 | **一律不用** |
 | `author_confirmed` | 作者確認過，附已知疑慮 | 可用，寫法取保守的一邊，不得比卡上的句子更強 |
+
+### 4.2 figures（主張的參考圖）
+
+blog 的圖（多半是論文的 Figure 或 Table 截圖）可以附在**用得到它的那條主張**上，一條主張 0 到 2 張。同一張圖被多條主張用，各自列一筆，檔案只存一份。
+
+```yaml
+    figures:
+      - file: figures/adaptive-chunking/figure5.png   # 相對於 wiki/；一律是 figures/<article>/<src>
+        article: adaptive-chunking                    # 必須是這張卡 sources 內的文章
+        src: figure5.png                              # blog 內文 image shortcode 的 src
+        caption: "圖 5：Split-then-Merge 遞迴切分管線…（來源：原始論文 Figure 5）"   # blog 的圖說原文，程式驗證
+        sha256: 3f2a…                                 # 圖檔雜湊，程式驗證
+```
+
+| 欄位 | 說明 |
+|---|---|
+| `file` | 圖在 wiki 內的位置，相對於 `wiki/`。下游讀圖的路徑是 `<submodule>/wiki/<file>` |
+| `article`、`src` | 圖的來源：哪篇 blog、shortcode 裡的檔名 |
+| `caption` | blog 對這張圖的說明，逐字；常含出處（「來源：原始論文 Figure 5」） |
+| `sha256` | 複製當下的雜湊。blog 之後改了圖，程式會發現並擋下 |
+
+**Stage 1 保證什麼，不保證什麼：**
+
+| 保證 | 不保證 |
+|---|---|
+| 圖真的來自 blog 內文、位元組沒被動過、`caption` 是 blog 原文 | 圖上所有內容都被查證。審查者只核對「主張提到的數字與語意」和圖有沒有矛盾，圖上其他內容沒有逐條對證 |
+| 這條主張的文字與圖沒有矛盾（審查者看過圖，數字只讀圖上印出來的，不目測估算） | 圖可以直接用在貼文。圖多半是論文原圖，使用方式（重製、標註出處）由下游決定 |
+| 主張文字不靠圖也讀得懂（讀者審查看不到圖） | 圖說的內容是主張。圖說是 blog 對圖的描述，不是主張，不能當作主張的依據（限定條件引用圖說交代範圍除外，見下） |
+
+規則：
+- **圖不是證據。** 主張的 `text`、`source_quotes` 一律來自 blog 文字；數字或結論若只存在於圖裡，就不能寫進主張。圖說（caption）也不能當主張的引文，唯一例外是下一條的限定條件。
+- **限定條件可以引用圖說，但只限範圍。** 資料集、模型組、設定這類範圍，blog 正文沒寫、只在圖說（例如「…的消融實驗（MuSiQue）」）時，主張附上那張圖，限定條件加 `source: figure_caption`，`source_quote` 取自這條主張自己附圖的圖說：
+
+  ```yaml
+      qualifiers:
+        - text: 這個消融是在 MuSiQue 上做的
+          source_quote: "表三 — 動態超邊建構中擴展跳數的消融實驗（MuSiQue）"
+          source: figure_caption
+  ```
+
+  圖說只能交代範圍，不能用來交代結論或比較對象；對證者核對限定條件是否忠於圖說、有沒有超出範圍。
+- 主張的 `status` 是 `pending_author_confirmation` 時，它的圖跟著不能用。`author_confirmed` 的主張，圖可用，寫法取保守。
+- 附了圖的主張，它的 `qualifiers` 仍必須一起帶出；圖不會取代限定條件。
 
 ## 5. 背景詞清單
 
@@ -129,7 +175,7 @@ claims:
 | 數學推導 | 可自行驗算的計算 |
 | 外部研究引用 | blog 引用的他人研究 |
 | 原作者解讀 | 論文或官方對結果的詮釋 |
-| 部落格推論 | blog 已明標為推論的內容 |
+| 部落格推論 | blog 對原因或機制的解釋或推測，論文沒有實測驗證，不論 blog 有沒有明標「推論」。好壞、該不該、值不值得的評價是「部落格判斷」 |
 | 部落格考證 | blog 作者對官方或第三方資料的換算、解讀 |
 | 部落格判斷 | blog 作者的評價 |
 | 背景說明 | blog 對既有領域概念或方法的說明（RLHF 做什麼、某指標的定義）。若是這篇文章的核心論點，或是在描述本文方法自己的設計，則不適用，改標其他類型（描述設計標設計參數） |
@@ -163,7 +209,8 @@ claims:
 - 含數字的主張必有 `comparison_target`，否則狀態必須是 `pending_author_confirmation`；例外：`numeric_kind: non_comparative` 搭配允許清單內的 `numeric_reason`，且主張不得含倍數、百分比、分數、價格寫法
 - `source_quotes` 與 `qualifiers[].source_quote` 不為空，且**逐字出現在 blog**、落在 `sources.sections` 列出的小節內
 - `author_confirmed` 必有 `confirmation.date`
-- （Stage 1 內部檢查，不屬於卡格式契約）`--claim-count`：每張卡主張數須在 `config/params.yaml` 的 `wiki.card_claim_range`（預設 10 到 20，含 pending 主張）。只在合併階段使用，提案階段不檢查
+- `figures`：每筆含 `file`、`article`、`src`、`caption`、`sha256`；`article` 在 `sources` 內；`file` 等於 `figures/<article>/<src>`；blog 內文有 image shortcode 引用這個 `src`；`caption` 與 blog 圖說一致；wiki 內的圖檔存在、sha256 與記錄和 blog 原圖都一致；每條主張不超過 `wiki.figure_max_per_claim` 張，副檔名與大小在 `wiki.figure_extensions`、`wiki.figure_max_kb` 內（皆在 `config/params.yaml`）。圖所在的 blog 小節不在 `sources.sections` 內只標 HINT。限定條件標 `source: figure_caption` 時，`source_quote` 必須逐字出現在這條主張自己附的圖的圖說（不檢查小節），`source` 只能是 `figure_caption`。任何主張的 `text` 若有「如圖」「見表」這類指向圖表的字眼，也標 HINT（主張必須不看圖也讀得懂）
+- 不指定卡、驗證整個 wiki 時，`wiki/figures/` 裡沒被任何主張引用的圖（孤兒圖）會被擋下
 
 逐字比對的正規化（`wikilib.normalize`）：NFKC 統一全半形、去掉 markdown 標記（粗體、表格線、標題與清單記號、連結語法、shortcode）、去掉引號字元、去掉所有空白。blog 與引文用同一個函式。引文裡的「…」把引文切成片段，每個片段都必須逐字出現且依序。
 
@@ -174,6 +221,7 @@ claims:
 | 內容 | Stage 1 | 下游（Stage 2） | 人 |
 |---|---|---|---|
 | frontmatter 與 claims | 寫 | 讀（submodule，唯讀） | 放行、確認去重關係、確認 `author_confirmed` |
+| `wiki/figures/` | 從 blog 複製 | 讀（submodule，唯讀） | |
 | `wiki/index.md` | 程式產生 | 讀 | |
 | `config/background-terms.md` | 讀 | 讀 | 維護 |
 

@@ -4,6 +4,7 @@
 """
 from __future__ import annotations
 
+import hashlib
 import os
 import re
 import unicodedata
@@ -22,8 +23,10 @@ def project_root() -> Path:
 
 
 ROOT = project_root()
+# wiki 目錄（卡的 figures[].file 相對於它）；測試會改這個變數，指向暫存的 wiki
+WIKI_DIR = ROOT / "wiki"
 # 觀念卡目錄；環境變數 DSO_CARDS_DIR 只給測試用（指向 tests/fixtures/concepts）
-CARDS_DIR = Path(os.environ.get("DSO_CARDS_DIR") or ROOT / "wiki" / "concepts")
+CARDS_DIR = Path(os.environ.get("DSO_CARDS_DIR") or WIKI_DIR / "concepts")
 
 
 def load_params() -> dict:
@@ -92,6 +95,7 @@ class Blog:
     title: str = ""
     body: str = ""  # 去掉 front matter 的原始 markdown
     sections: list[Section] = field(default_factory=list)
+    captions_norm: list[str] = field(default_factory=list)  # 圖片 shortcode 的圖說（正規化）；不在 full_norm 內
 
 
 def load_blog(slug: str, params: dict | None = None) -> Blog:
@@ -120,7 +124,33 @@ def load_blog(slug: str, params: dict | None = None) -> Blog:
         sec_text = "\n".join(lines[i + 1:end])
         secs.append(Section(title=title, level=level, body_norm=normalize(sec_text),
                             title_norm=normalize(title)))
-    return Blog(slug=slug, path=path, full_norm=normalize(body), title=fm_title, body=body, sections=secs)
+    blog = Blog(slug=slug, path=path, full_norm=normalize(body), title=fm_title, body=body, sections=secs)
+    blog.captions_norm = [normalize(i["caption"]) for i in blog_images(blog) if i["caption"]]
+    return blog
+
+
+# ---------------------------------------------------------------- blog 圖片（image shortcode）
+
+_IMG_SHORTCODE = re.compile(r"\{\{<\s*image\s+(.*?)\s*>\}\}", re.S)
+_SC_ATTR = re.compile(r'(\w+)\s*=\s*"((?:[^"\\]|\\.)*)"')
+_HEADING = re.compile(r"^#{2,6}\s+(.*\S)\s*$", re.M)
+
+
+def blog_images(blog: Blog) -> list[dict]:
+    """blog 內文裡所有 `{{< image src=… caption=… >}}`：src、alt、caption（跳脫引號還原）、所在小節標題。"""
+    out = []
+    for m in _IMG_SHORTCODE.finditer(blog.body):
+        attrs = {k: v.replace('\\"', '"') for k, v in _SC_ATTR.findall(m.group(1))}
+        if "src" not in attrs:
+            continue
+        heads = _HEADING.findall(blog.body[:m.start()])
+        out.append({"src": attrs["src"], "alt": attrs.get("alt", ""), "caption": attrs.get("caption", ""),
+                    "section": heads[-1] if heads else ""})
+    return out
+
+
+def sha256_of(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 _ELLIPSIS = re.compile(r"…+|\.{3,}")

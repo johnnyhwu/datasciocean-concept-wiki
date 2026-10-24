@@ -5,8 +5,9 @@
       --claim-count：另外檢查每張卡的主張數是否在 params 的 wiki.card_claim_range 內（含 pending 主張）。
                      只在「合併階段」（提案確認、合併完成之後）加這個旗標；挖卡與提案階段不要用，
                      避免為了湊主張數而把卡寫大。預設不檢查。
+      不給參數時另查 wiki/figures/ 有沒有沒被任何主張引用的圖（孤兒圖）。
 結束碼：0 通過（可能有 HINT）、1 有 ERROR。
-HINT 不退回，交給對證者（主張數字不在來源原文）。
+HINT 不退回，交給對證者（主張數字不在來源原文、附圖不在 sources.sections 的小節內）。
 """
 from __future__ import annotations
 
@@ -20,6 +21,72 @@ ROLES = {"thesis", "context", "mechanism", "anchor", "evidence", "evaluation", "
 CLAIM_STATUS = {"normal", "pending_author_confirmation", "author_confirmed"}
 CONTEXT_TYPES = {"bound_to_source", "evidence_from_single_source", "standalone_classic"}
 CARD_STATUS = {"active", "retired"}
+
+
+FIGURE_KEYS = ("file", "article", "src", "caption", "sha256")
+
+
+def check_figures(c: dict, tag: str, slugs: set[str], blogs: dict, params: dict,
+                  section_norms: set[str], err: list[str], hint: list[str]) -> None:
+    """主張的 figures：參考圖（docs/card-format.md §4.2）。圖不是證據，這裡只驗「圖真的來自 blog、沒被動過」。"""
+    figs = c.get("figures")
+    if figs is None:
+        return
+    if not isinstance(figs, list) or not all(isinstance(f, dict) for f in figs):
+        err.append(f"{tag} figures 必須是物件清單")
+        return
+    if len(figs) > params["wiki"]["figure_max_per_claim"]:
+        err.append(f"{tag} 附圖 {len(figs)} 張，超過每條主張上限 {params['wiki']['figure_max_per_claim']}")
+    for f in figs:
+        missing = [k for k in FIGURE_KEYS if not f.get(k)]
+        if missing:
+            err.append(f"{tag} figures 項目缺少 {missing}")
+            continue
+        label = f"{tag} 圖 {f['file']}"
+        if f["article"] not in slugs:
+            err.append(f"{label}：article={f['article']!r} 不在這張卡的 sources 內")
+            continue
+        blog = blogs.get(f["article"])
+        if blog is None:
+            continue  # blog 不存在，sources 檢查已報錯
+        src = f["src"]
+        if f["file"] != f"figures/{f['article']}/{src}" or ".." in Path(src).parts:
+            err.append(f"{label}：file 必須是 figures/{f['article']}/{src}")
+            continue
+        ext = Path(src).suffix.lower()
+        if ext not in set(params["wiki"]["figure_extensions"]):
+            err.append(f"{label}：副檔名 {ext!r} 不在 wiki.figure_extensions 內")
+        img = next((i for i in W.blog_images(blog) if i["src"] == src), None)
+        if img is None:
+            err.append(f"{label}：blog 內文沒有 image shortcode 引用 {src!r}")
+            continue
+        if W.normalize(f["caption"]) != W.normalize(img["caption"]):
+            err.append(f"{label}：caption 與 blog 的圖說不一致")
+        if img["section"] and section_norms and W.normalize(img["section"]) not in section_norms:
+            hint.append(f"{label}：圖所在小節 {img['section']!r} 不在 sources.sections 內（交對證者判斷相關性）")
+        original = blog.path.parent / src
+        copy = W.WIKI_DIR / f["file"]
+        if not original.is_file():
+            err.append(f"{label}：blog 資料夾裡找不到原圖 {src!r}")
+        elif W.sha256_of(original) != f["sha256"]:
+            err.append(f"{label}：blog 的原圖已改變（sha256 不符）：重跑 copy_figure.py，看過新圖後，附這張圖的主張要重審")
+        if not copy.is_file():
+            err.append(f"{label}：wiki 裡沒有這個檔案（用 copy_figure.py 複製）")
+            continue
+        if W.sha256_of(copy) != f["sha256"]:
+            err.append(f"{label}：wiki 裡的圖與記錄的 sha256 不符（被改過？重跑 copy_figure.py）")
+        if copy.stat().st_size > params["wiki"]["figure_max_kb"] * 1024:
+            err.append(f"{label}：超過 {params['wiki']['figure_max_kb']} KB")
+
+
+def orphan_figures(cards: list[W.Card]) -> list[str]:
+    """wiki/figures/ 裡沒有被任何主張引用的檔案。"""
+    used = {f.get("file") for card in cards for c in card.claims for f in (c.get("figures") or []) if isinstance(f, dict)}
+    root = W.WIKI_DIR / "figures"
+    if not root.is_dir():
+        return []
+    found = {p.relative_to(W.WIKI_DIR).as_posix() for p in root.rglob("*") if p.is_file() and p.name != ".DS_Store"}
+    return sorted(found - used)
 
 
 def check_card(card: W.Card, all_ids: set[str], params: dict, blogs: dict) -> tuple[list[str], list[str]]:
@@ -47,6 +114,7 @@ def check_card(card: W.Card, all_ids: set[str], params: dict, blogs: dict) -> tu
     # ---- sources 與 blog
     sources = f.get("sources") or []
     allowed_sections: list[W.Section] = []
+    slugs = {s.get("article") for s in sources}
     for s in sources:
         slug = s.get("article")
         for k in ("article", "article_title", "url", "sections", "first_appearance"):
@@ -84,6 +152,7 @@ def check_card(card: W.Card, all_ids: set[str], params: dict, blogs: dict) -> tu
         err.append("至少需要一條 role=context 的主張（這是什麼）")
 
     all_blog_norms = [b.full_norm for b in blogs.values()]
+    section_norms = {W.normalize(t) for s in sources for t in (s.get("sections") or [])}
     anchor_types = set(params["wiki"]["anchor_types"])
 
     for c in claims:
@@ -131,6 +200,13 @@ def check_card(card: W.Card, all_ids: set[str], params: dict, blogs: dict) -> tu
         for q in c.get("qualifiers") or []:
             if not q.get("text") or not q.get("source_quote"):
                 err.append(f"{tag} qualifiers 項目需有 text 與 source_quote")
+            elif q.get("source") is not None:
+                # 來源是圖說：限定「範圍、資料集、設定」用，引文必須逐字出現在這條主張自己附的圖的圖說
+                if q["source"] != "figure_caption":
+                    err.append(f"{tag} qualifiers 的 source 只能是 figure_caption：{q['source']!r}")
+                elif not any(W.quote_in_text(q["source_quote"], W.normalize(f.get("caption", "")))
+                             for f in (c.get("figures") or []) if isinstance(f, dict)):
+                    err.append(f"{tag} 限定條件標明來源是圖說，但引文未逐字出現在這條主張自己附的圖的圖說：{q['source_quote'][:40]!r}…")
             else:
                 quote_texts.append(q["source_quote"])
         for q in quote_texts:
@@ -141,6 +217,10 @@ def check_card(card: W.Card, all_ids: set[str], params: dict, blogs: dict) -> tu
                 err.append(f"{tag} 來源原文未逐字出現在 blog：{q[:40]!r}…")
             elif allowed_sections and not any(W.quote_in_text(q, s.body_norm) for s in allowed_sections):
                 err.append(f"{tag} 來源原文不在 sources.sections 列出的小節內：{q[:40]!r}…")
+
+        check_figures(c, tag, slugs, blogs, params, section_norms, err, hint)
+        if re.search(r"如圖|見圖|下圖|上圖|[如見上下]表(?!現)", str(c.get("text", ""))):
+            hint.append(f"{tag} 主張文字有指向圖表的字眼（如圖、見表…）：主張必須不看圖也讀得懂，請改寫或確認")
 
         # HINT：主張數字不在來源原文
         qnorm = "".join(W.normalize(q) for q in quote_texts if isinstance(q, str))
@@ -176,6 +256,10 @@ def main(argv: list[str]) -> int:
     for d in dup:
         print(f"ERROR 全 wiki id 重複：{d}")
         failed = True
+    if not argv:
+        for o in orphan_figures(all_cards):
+            print(f"ERROR 孤兒圖（沒有任何主張引用）：{o}")
+            failed = True
     for card in cards:
         err, hint = check_card(card, all_ids, params, blogs)
         if count_check:

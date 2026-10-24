@@ -1,6 +1,6 @@
 ---
 name: distill-article
-description: 把 DataSci Ocean 的一篇 blog 文章提煉成觀念卡（Stage 1）並寫進 wiki/。使用者要「處理一篇文章」「提煉觀念」「建觀念卡」「審卡」「blog 改了要重審」時使用。涵蓋挖候選、篩選與合併、寫卡、程式檢查、對證者與讀者審查迴圈、全文審查、去重與放行。不處理 IG 或 Threads 貼文（那是另一個 repo：datasciocean-social-media）。
+description: 把 DataSci Ocean 的一篇 blog 文章提煉成觀念卡（Stage 1）並寫進 wiki/。使用者要「處理一篇文章」「提煉觀念」「建觀念卡」「審卡」「blog 改了要重審」時使用。涵蓋挖候選、篩選與合併、寫卡（含主張附圖）、程式檢查、對證者與讀者審查迴圈、全文審查、去重與放行。不處理 IG 或 Threads 貼文（那是另一個 repo：datasciocean-social-media）。
 ---
 
 # distill-article：blog 文章 → 觀念卡
@@ -9,10 +9,9 @@ description: 把 DataSci Ocean 的一篇 blog 文章提煉成觀念卡（Stage 1
 
 ## 開始前（每次都做）
 
-1. `git submodule update --remote`（blog 要是最新的）。
-2. `uv sync`（環境全在 repo 內：`.venv/`、`.uv-cache/`；缺才跑）。腳本一律 `uv run python .claude/skills/distill-article/scripts/<name>.py`。
-3. 讀 `docs/card-format.md`、`wiki/index.md`（看已有哪些觀念）、`config/background-terms.md`、`config/params.yaml`。
-4. 用 `blog/content/posts/*/<slug>/index.zh-tw.md` 找文章；文章的小節標題文字就是 `sources.sections` 要填的值。
+1. 先做 CLAUDE.md「每次開始前」的兩件事（更新 blog submodule、環境）。腳本一律 `uv run python .claude/skills/distill-article/scripts/<name>.py`。
+2. 讀 `docs/card-format.md`、`wiki/index.md`（看已有哪些觀念）、`config/background-terms.md`、`config/params.yaml`。
+3. 用 `blog/content/posts/*/<slug>/index.zh-tw.md` 找文章；文章的小節標題文字就是 `sources.sections` 要填的值。
 
 ## 流程
 
@@ -32,10 +31,10 @@ description: 把 DataSci Ocean 的一篇 blog 文章提煉成觀念卡（Stage 1
 |---|---|---|
 | 2–3 | 依優先順序挖候選；五個篩選測試；合併規則 R1–R5 | `references/mining-and-filtering.md` |
 | 3.5 | **給人看提案**（id、一句話論點、主要錨點、合併或淘汰理由），等人回覆才寫卡。**提案階段不看主張數**，避免為湊數而偏頗 | `references/mining-and-filtering.md` |
-| 4 | 寫卡：主張盡量用 blog 的字、引文涵蓋每個成分、比較對象、限定條件（寫卡前先做自檢清單）、脈絡主張 | `references/card-writing.md` |
+| 4 | 寫卡：主張盡量用 blog 的字、引文涵蓋每個成分、比較對象、限定條件（寫卡前先做自檢清單）、脈絡主張；主張用得到的 blog 圖就附上（`copy_figure.py`），圖只是參考、不是證據 | `references/card-writing.md`（附圖見 §12） |
 | 5 | `validate_card.py <card.md>`：結構與引文逐字比對，直到 PASS。合併完成後再加 `--claim-count`，每張卡主張數須在 10 到 20 | `docs/card-format.md` §8 |
-| 6 | 對證者：只看「卡加引用與參考文獻」，不讀整篇 blog | `references/review-loop.md`、`references/auditor-prompt.md` |
-| 7 | 獨立讀者：只看移除引用的卡 | `references/review-loop.md`、`references/reader-prompt.md` |
+| 6 | 對證者：只看「卡加引用與參考文獻」，不讀整篇 blog；附圖的主張另外看圖，核對主張與圖有沒有矛盾 | `references/review-loop.md`、`references/auditor-prompt.md` |
+| 7 | 獨立讀者：只看移除引用與附圖的卡 | `references/review-loop.md`、`references/reader-prompt.md` |
 | 8 | 全文審查：整篇 blog 讀一次，審這篇的所有卡 | `references/final-audit-prompt.md` |
 | 9–10 | 去重、關係、放行、報告 | `references/release.md` |
 
@@ -45,23 +44,24 @@ description: 把 DataSci Ocean 的一篇 blog 文章提煉成觀念卡（Stage 1
 
 - **寫卡前的提案清單**（哪些觀念要寫、哪些合併或淘汰），人確認後才寫卡。
 - 去重與關係提議（重複、實例、相關、全新）。
-- blog 內部矛盾怎麼處理（預設：不修 blog；審查者列出的真矛盾（數字、事實對不上）相關主張先標 `pending_author_confirmation`；只是措辭瑕疵、讀 blog 說得通的，由撰寫者用限定條件 resolve，細節見 `card-writing.md` §10；兩者都列給人可推翻）。
+- blog 內部矛盾（含圖與文字對不上）：預設不修 blog；真矛盾先標 `pending_author_confirmation`，措辭瑕疵由撰寫者用限定條件 resolve，兩者都列給人可推翻（分類見 `card-writing.md` §10）。
 - 背景詞清單以外、blog 也沒解釋、且**不是很基本**的「通用知識」詞（很基本的詞由撰寫者補在卡的「名詞補充」小節，不必問，見 `references/card-writing.md` §7）。
 - 審查者與撰寫者的爭議條目（撰寫者不能反駁審查者，只能標爭議）。
 - 輪數用完仍有 blocker。
 - 新增或變動的 `pending_author_confirmation` 主張；任何 `author_confirmed`。
 
-以上都沒有、且三關都通過 → 直接寫入 wiki，不必等人放行（使用者 2026-10-04 核准）。完成後給人一份報告（`references/release.md` §3）。
+以上都沒有、且三關都通過 → 直接寫入 wiki，不必等人放行。完成後給人一份報告（`references/release.md` §3）。
 
 ## 腳本（`scripts/`）
 
 | 腳本 | 用途 |
 |---|---|
-| `validate_card.py` | 結構驗證加引文逐字比對（可一次驗全部卡）；`--claim-count` 另查主張數（只在合併階段用） |
-| `make_auditor_copy.py` | 產生對證者版卡：主張後標 [n]，卡尾參考文獻與引文所在段落（`--only` 只審改動的主張） |
-| `verify_audit.py` | 驗證對證者 JSON：引用逐字、分級（blocker 與 minor）、pending 不擋 |
-| `claim_fingerprints.py` | 主張指紋：`save` 存已通過的、`diff` 列出新增或改過的 |
-| `make_reader_copy.py` | 產生讀者版卡（移除引用與參考文獻；卡有「名詞補充」小節時原樣附在末尾） |
+| `validate_card.py` | 結構驗證加引文逐字比對、附圖檢查（可一次驗全部卡；不指定檔案時連孤兒圖一起查）；`--claim-count` 另查主張數（每張卡 10 到 20，只在合併階段用） |
+| `copy_figure.py` | 把 blog 的一張圖複製進 `wiki/figures/<article>/`，印出可貼進主張 `figures` 的 YAML（含 caption 與 sha256；`--indent N` 對齊主張縮排） |
+| `make_auditor_copy.py` | 產生對證者版卡：主張後標 [n]，卡尾參考文獻與引文所在段落；附圖的主張列出圖檔路徑（`--only` 只審改動的主張） |
+| `verify_audit.py` | 驗證對證者 JSON：引用逐字、分級（blocker 與 minor）、附圖的 figure_checks、pending 不擋 |
+| `claim_fingerprints.py` | 主張指紋（含 `figures`）：`save` 存已通過的、`diff` 列出新增或改過的 |
+| `make_reader_copy.py` | 產生讀者版卡（移除引用、參考文獻與附圖；卡有「名詞補充」小節時原樣附在末尾） |
 | `verify_reader.py` | 驗證讀者 JSON：主軸三題都要有卡上引用；陷阱題可答「卡上沒寫」，其餘不行 |
 | `verify_final_audit.py` | 驗證全文審查 JSON：斷章取義、限定條件掉了、跨卡矛盾、blog 矛盾 |
 | `build_index.py` | 產生 `wiki/index.md`（程式產生，不手改） |
@@ -71,9 +71,9 @@ description: 把 DataSci Ocean 的一篇 blog 文章提煉成觀念卡（Stage 1
 
 ## 派發 subagent 的做法
 
-- 審查者提示詞放在 `references/`，派發訊息只給提示詞路徑與變數（檔案路徑），不要貼全文。審查者是獨立的：看不到撰寫者推理、看不到其他卡、看不到上一輪結果。
+- 審查者提示詞放在 `references/`，派發訊息只給提示詞路徑與變數（檔案路徑），不要貼全文；各審查者的訊息範本在 `references/dispatch-templates.md`。審查者是獨立的：看不到撰寫者推理、看不到其他卡、看不到上一輪結果。對證者除了卡副本，還會用 Read 看副本列出的圖檔。
 - 每輪都用**全新** subagent。
-- 並行上限 20。一次派不完就分批；派完用檔案數核對「應到／實到」（我曾漏發而不自知）。
+- 並行上限 20。一次派不完就分批；派完用檔案數核對「應到／實到」，避免漏發。
 - **每個 subagent 約有 38k token 的固定成本**（讀提示詞與檔案），即使只審 1 條主張。補審時把同一輪、同一張卡（甚至多張卡）的改動併成**一個** subagent，依序審各份副本、各寫各的 JSON；不要一條主張派一個。
 - 審查產出（JSON、卡副本、指紋檔）放暫存目錄（本次工作的 scratchpad），不放進 repo。
 - 修改卡的人是撰寫者（你），審查者只指出問題、不給改寫版本。

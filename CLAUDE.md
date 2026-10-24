@@ -35,28 +35,29 @@ blog 文章（blog/ submodule）──[Stage 1：提煉觀念]──> wiki/conce
 5. **每個數字都要有比較對象；錨點類型要標對。** 「官方宣稱」標錯會直接擋下。
 6. **限定條件綁在主張上**（`qualifiers`），下游用主張就必須帶出它的限定條件。
 7. **寧可暫停，也不降低標準。** 輪數用完仍有 blocker，升級給人，不自動放行。
-8. **不確定就停下來問人。** 寫卡前的提案清單、去重與關係、blog 內部矛盾（審查者列出的一律先標 pending）、非基本的通用知識詞、爭議條目、新增的 pending，都由人決定。
+8. **不確定就停下來問人。** 寫卡前的提案清單、去重與關係、blog 內部矛盾（真矛盾先標 pending；措辭瑕疵由撰寫者用限定條件 resolve，兩者都報告供人推翻）、非基本的通用知識詞、爭議條目、新增的 pending，都由人決定。
 9. **環境限縮在 repo 內。** uv 的快取與虛擬環境都在 repo 內。
 10. **撰寫者寫卡時就要謹慎。** 審查是最後防線，不是替撰寫者找限定條件的工具；照 `card-writing.md` §11 自檢，避免審查者來回多次、甚至全文審查才抓到問題。
+11. **圖只是主張的參考，不是證據。** 主張可附 blog 的圖（`figures`），但文字與引文永遠來自 blog 文字，不能只靠圖寫主張；每張附圖由對證者看圖核對有沒有矛盾。圖說不能當主張的引文，只能在限定條件裡交代範圍（資料集、設定）。圖從 blog 複製，不自己生成或修改。見 `card-writing.md` §12。
 
 ## 目錄
 
 ```
 CLAUDE.md
 .claude/skills/distill-article/   Stage 1 的流程、腳本、審查者提示詞
-docs/                             card-format.md（契約，Stage 1 與 Stage 2 共用）、status.md（目前狀態）、stage1-token-usage.md（實跑的 token 紀錄）
+docs/                             card-format.md（契約，Stage 1 與 Stage 2 共用）、status.md（目前狀態）、stage1-token-usage.md（實跑的 token 紀錄）、guideline-for-downstream.md（附圖契約變更的交接說明，給下游 repo；下游同步完成後可刪）
 config/                           params.yaml、background-terms.md（人會改的放這裡）
-wiki/                             index.md（程式產生）、concepts/<id>.md
+wiki/                             index.md（程式產生）、concepts/<id>.md、figures/<article>/（主張附的參考圖，從 blog 複製）
 blog/                             blog 的 submodule（唯讀）
 tests/                            test_stage1_programs.py、fixtures/concepts/（測試用的卡，不是真實觀念庫）
 ```
 
-為什麼 `config/` 不放進 skill：這是人會調整的設定與人維護的詞表，放在根目錄一眼找得到；流程知識（agent 怎麼做事）才放 `.claude/`。`docs/card-format.md` 也留在根目錄，因為它是給下游 repo 看的契約，不只是給本 repo 的 skill 看。
+`config/`（人會調的設定與詞表）和 `docs/card-format.md`（給下游看的契約）放根目錄；流程知識（agent 怎麼做事）放 `.claude/`。
 
 ## 與下游 repo 的關係
 
 - 下游以 submodule 讀 `wiki/` 與 `docs/card-format.md`；下游看到的卡 = 你 commit 並 push 的版本。commit 與 push 由人決定時機，**不要自己 commit 或 push**。
-- 改 `docs/card-format.md`（欄位、狀態語意、錨點類型）等於改契約，要提醒人同步更新下游的 `cardlib.py` 與 `references/anchor-writing-rules.md`。
+- 改 `docs/card-format.md`（欄位、狀態語意、錨點類型）等於改契約，要提醒人同步更新下游的 `cardlib.py` 與 `references/anchor-writing-rules.md`。下游還沒同步的契約變更，寫在 `docs/guideline-for-downstream.md`。
 - 新增錨點類型必須同時在下游定義 Stage 2 的寫法規則，否則不得新增。
 
 ## 目前狀態

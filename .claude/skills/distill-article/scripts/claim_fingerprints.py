@@ -1,11 +1,11 @@
-"""主張指紋：判斷哪些主張是「新增或改過的」，只重審它們（第一次實跑後與人討論採用）。
+"""主張指紋：判斷哪些主張是「新增或改過的」，只重審它們。
 
 用法：
   uv run python .claude/skills/distill-article/scripts/claim_fingerprints.py save <accepted.json> <card.md> [--blockers c1,c2]
       把這張卡「未被擋下」的主張指紋存進 accepted.json（累加）。--blockers 的主張不存。
   uv run python .claude/skills/distill-article/scripts/claim_fingerprints.py diff <accepted.json> <card.md>
       印出這張卡需要審的 claim id（指紋不在 accepted.json 裡的）。
-指紋涵蓋：role、text、source_quotes、anchor_type、comparison_target、qualifiers、status、numeric_*。
+指紋涵蓋：role、text、source_quotes、anchor_type、comparison_target、qualifiers、status、numeric_*、figures（含 sha256，所以換圖會觸發重審）。
 """
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ from pathlib import Path
 import wikilib as W
 
 KEYS = ("role", "text", "source_quotes", "anchor_type", "comparison_target",
-        "qualifiers", "status", "numeric_kind", "numeric_reason")
+        "qualifiers", "status", "numeric_kind", "numeric_reason", "figures")
 
 
 def fp(claim: dict) -> str:

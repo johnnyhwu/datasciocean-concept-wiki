@@ -10,6 +10,8 @@
     擋下（blocker）：判定為「不支持／找不到」、引用捏造、或固定錯誤屬於
         數字對不上、範圍被放大、因果說得比原文強、夾帶blog沒有的判斷、限定條件掉了、舉例變成唯一，
         或「錨點類型標錯」且卡上標的是「官方宣稱」（Stage 2 的主詞規則依賴它）。
+    附圖的主張，每張圖都要有 figure_checks 且判定為「一致」並寫出圖上位置與讀到的內容；
+        判定矛盾／不相關／看不清、漏核、或沒有對證，都算 blocker（圖不是證據，但附了就必須核對過）。
     只記錄（minor）：主張與來源措辭不同、來源沒涵蓋主張的每個成分、限定詞沒定義、
         其他錨點類型邊界、主張互核矛盾、審查者自己的引用錯誤。
   有 blocker 才整張卡退回；minor 只列在備註。
@@ -26,6 +28,7 @@ import wikilib as W
 VERDICTS = {"完全支持", "部分支持", "不支持", "找不到"}
 BLOCKER_ERRORS = {"數字對不上", "範圍被放大", "因果說得比原文強", "夾帶blog沒有的判斷",
                   "限定條件掉了", "舉例變成唯一"}
+FIGURE_VERDICTS = {"一致", "矛盾", "不相關", "看不清"}
 FIXED_ERRORS = {
     "數字對不上", "範圍被放大", "舉例變成唯一", "錨點類型標錯", "限定條件掉了",
     "夾帶blog沒有的判斷", "因果說得比原文強", "限定詞沒定義", "來源沒涵蓋主張的每個成分",
@@ -41,9 +44,13 @@ def main(card_path: str, audit_path: str, only_ids: list[str] | None = None, cop
     slugs = [s["article"] for s in card.front.get("sources", [])]
     blogs = [W.load_blog(s, params) for s in slugs]
     norms = [b.full_norm for b in blogs]
+    caption_norms = [c for b in blogs for c in b.captions_norm]  # 圖說：只有限定條件可以引用，不是主張的支持依據
 
     def in_blog(q: str) -> bool:
         return bool(q) and any(W.quote_in_text(q, n) for n in norms)
+
+    def in_caption(q: str) -> bool:
+        return bool(q) and any(W.quote_in_text(q, n) for n in caption_norms)
 
     rejects: list[str] = []   # blocker
     notes: list[str] = []     # minor 與備註
@@ -69,6 +76,13 @@ def main(card_path: str, audit_path: str, only_ids: list[str] | None = None, cop
             if v not in VERDICTS:
                 blockers.append(f"判定值非法：{v!r}")
                 continue
+            if q and not in_blog(q) and in_caption(q):
+                # 圖說不是主張的支持依據：拿圖說判「完全支持」等於讓圖說繞過引文規則
+                if v == "完全支持":
+                    blockers.append(f"完全支持卻只引用了圖說（圖說不能當主張的支持依據；範圍請用標明來源圖說的限定條件）：{txt!r}")
+                else:
+                    minors.append(f"審查者引用的是圖說，不計入支持判定：{q[:30]!r}… 原判定 {v}")
+                continue
             if q and not in_blog(q):
                 minors.append(f"審查者引用未逐字出現在 blog（審查者的錯，需人眼確認）：{q[:30]!r}… 原判定 {v}")
                 continue
@@ -87,6 +101,21 @@ def main(card_path: str, audit_path: str, only_ids: list[str] | None = None, cop
                 blockers.append(f"{v}：{txt!r}｜{a.get('note','')[:80]}")
             elif v == "部分支持":
                 minors.append(f"部分支持：{txt!r}｜{a.get('note','')[:80]}")
+        checks = {str(x.get("file", "")).strip(): x for x in entry.get("figure_checks") or []}
+        for f in claim_by_id[cid].get("figures") or []:
+            # 審查者可能填 file= 後面的相對路徑，也可能填圖檔的完整路徑：兩者都接受
+            key = next((k for k in checks if k and (k == f["file"] or k.endswith("/" + f["file"]))), None)
+            x = checks.pop(key) if key is not None else None
+            if x is None:
+                blockers.append(f"沒有核對附圖 {f['file']}")
+            elif x.get("verdict") not in FIGURE_VERDICTS:
+                blockers.append(f"附圖判定值非法：{x.get('verdict')!r}（{f['file']}）")
+            elif x["verdict"] != "一致":
+                blockers.append(f"附圖{x['verdict']}（{f['file']}）｜{x.get('note','')[:80]}")
+            elif not (str(x.get("location", "")).strip() and str(x.get("read", "")).strip()):
+                blockers.append(f"附圖判定一致但沒有寫出圖上位置與讀到的內容（{f['file']}）")
+        for left in checks:
+            notes.append(f"[{cid}] 審查者核對了卡上沒有的圖：{left}")
         for e in entry.get("errors", []):
             if e not in FIXED_ERRORS:
                 notes.append(f"[{cid}] 錯誤類別不在固定清單：{e!r}")

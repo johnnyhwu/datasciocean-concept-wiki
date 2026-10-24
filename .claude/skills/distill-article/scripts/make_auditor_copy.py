@@ -10,6 +10,9 @@
                             或只給引文本身（最省，但對證者看不到前後句）
         [--neighbors N]     paragraph 模式下，每個引文段落前後各多帶 N 段（預設 0）
 
+主張附的參考圖（figures）列出圖檔絕對路徑與 blog 圖說，供對證者用 Read 看圖、核對主張與圖有沒有矛盾；
+圖與圖說都不是主張的支持依據（支持依據只有引文）；唯一例外是標明「來源：圖說」的限定條件，只用來交代範圍、資料集、設定。
+
 這份副本看不到的東西（由「全文審查」補）：blog 其他段落的矛盾、卡漏掉的重點、
 跨卡矛盾、引文前後段落對範圍的限定。
 """
@@ -159,7 +162,13 @@ def main(card_path: str, out_path: str, only: set[str] | None, neighbors: int, c
         if c.get("confirmation"):
             lines.append(f"  作者確認：{c['confirmation']}")
         for q in c.get("qualifiers") or []:
-            lines.append(f"  限定條件：{q.get('text')} {marks([q['source_quote']]) if q.get('source_quote') else ''}")
+            if q.get("source") == "figure_caption":
+                lines.append(f"  限定條件：{q.get('text')}（來源：這條主張附圖的圖說，只能支持範圍、資料集、設定：「{q.get('source_quote')}」）")
+            else:
+                lines.append(f"  限定條件：{q.get('text')} {marks([q['source_quote']]) if q.get('source_quote') else ''}")
+        for f in c.get("figures") or []:
+            lines.append(f"  參考圖 file={f['file']}｜圖檔路徑：{W.WIKI_DIR / f['file']}")
+            lines.append(f"    blog 圖說（不能當主張的支持依據；只有標明「來源：圖說」的限定條件可以引用它，且只限範圍、資料集、設定）：{f['caption']}")
         lines.append("")
     if others:
         lines += ["## 其他主張（已通過先前審查，只供主張互核，不必逐條審）", ""]

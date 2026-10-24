@@ -11,11 +11,11 @@
 | 相關 | 設 `related`（無方向、雙向各寫一邊） |
 | 全新 | 新建卡，不設關係 |
 
-**提議由人確認後才寫入**，判斷錯誤會汙染整個 wiki。同一篇文章提煉出的卡之間，第一次實跑採用：概覽卡與其餘各卡互設 `related`，不設 `parent`。
+**提議由人確認後才寫入**，判斷錯誤會汙染整個 wiki。同一篇文章提煉出的卡之間：互設 `related`、不設 `parent`；有概覽或核心卡時，以它為中心與其餘各卡互設，其餘卡之間視關聯加設。
 
 ## 2. 放行與寫入
 
-- 三關審查都通過、且沒有下列任何一項待人處理，就**直接寫入 wiki，不等人放行**（使用者 2026-10-04 核准）：
+- 三關審查都通過、且沒有下列任何一項待人處理，就**直接寫入 wiki，不等人放行**：
   - 去重或關係提議、
   - 非基本的通用知識詞（背景詞清單以外、blog 也沒解釋；很基本的詞由撰寫者補在「名詞補充」，不算）、
   - 爭議條目、
@@ -23,7 +23,7 @@
   - 新增或變動的 `pending_author_confirmation`、任何 `author_confirmed`、
   - 全文審查的「交人裁決」項目（跨卡矛盾、blog 內部矛盾）。
 - 有上列任何一項：先把這些項目整理成一份簡短清單問人，人回覆後再寫入。卡檔案此時已在 `wiki/concepts/`（未 commit）；這裡的「寫入」指人回覆後重建 index 並更新 `docs/status.md`。blog 內部矛盾不必等人回覆：真矛盾先標 pending；措辭瑕疵由撰寫者用限定條件 resolve（見 `card-writing.md` §10），兩者都在清單裡列出供人推翻。
-- 寫入前最後跑一次 `validate_card.py`（全部卡）與 `build_index.py`。
+- 寫入前最後跑一次 `validate_card.py`（全部卡，不指定檔案：連同 `wiki/figures/` 的孤兒圖一起查）與 `build_index.py`。
 - 人確認的通用知識詞，若是一般性詞彙，加進 `config/background-terms.md`；MTok、rubric 這類在卡上只是引文單位或名稱標籤的，不加。
 
 寫入後，Stage 2 在另一個 repo（`datasciocean-social-media`）更新 submodule 才看得到新卡；本 repo 不知道、也不該知道 Stage 2 的狀態。要讓下游看到，需要在本 repo commit 並 push（commit 與 push 由人決定時機）。
@@ -36,11 +36,13 @@
 - 三關審查的結果摘要（對證者與讀者各幾輪、blocker 有哪些已修、全文審查結果）；
 - pending 與 author_confirmed 清單（含 blog 矛盾的具體內容，供人決定要不要修 blog）；
 - 通用知識詞與去重關係的處理結果；
-- 審查的 token 用量（subagent 回報的 usage 加總，按對證者、讀者、全文審查分開）——第一次實跑後成本是主要痛點，每次都量，累積到 `docs/stage1-token-usage.md`。表格欄位：類別、subagent 個數、token、占比；另列「沒採用結果的 subagent」（重複派發、被併掉的卡的審查等）與哪些地方花得不合理。
+- 附圖清單（哪條主張附了哪張圖、為什麼有幫助），供人刪減；
+- 審查的 token 用量（subagent 回報的 usage 加總，按對證者、讀者、全文審查分開）——成本是主要痛點，每次都量，累積到 `docs/stage1-token-usage.md`。表格欄位：類別、subagent 個數、token、占比；另列「沒採用結果的 subagent」（重複派發、被併掉的卡的審查等）與哪些地方花得不合理。
 
 ## 4. blog 改了之後
 
 blog 更新（`git submodule update --remote` 後文章有變）時：
 1. 對受影響的卡跑 `validate_card.py`，引文不再逐字出現的主張會被擋下。
-2. 引文仍在、但上下文可能變了的主張，用 `make_auditor_copy.py` 重新產生副本，派對證者重審，必要時再跑全文審查。
-3. 改動後的卡照常過讀者與全文審查（只在主張內容變動時）。
+2. blog 換了附圖的原圖：`validate_card.py` 會報「blog 的原圖已改變」。重跑 `copy_figure.py <article> <src>` 取得新圖與新 sha256，自己看過新圖，更新主張的 `figures`；指紋含 sha256，`claim_fingerprints.py diff` 會列出這些主張，交對證者重審。blog 刪掉或改名了那張圖，就移除主張的 `figures` 和 `wiki/figures/` 裡的檔案（孤兒圖會被擋下）。
+3. 引文仍在、但上下文可能變了的主張，用 `make_auditor_copy.py` 重新產生副本，派對證者重審，必要時再跑全文審查。
+4. 改動後的卡照常過讀者與全文審查（只在主張內容變動時）。

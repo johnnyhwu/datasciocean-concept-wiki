@@ -57,7 +57,7 @@ def main(copy_path: str, reader_path: str, traps: list[int] | None = None) -> in
         ans = q.get("answer", "")
         ok, bad = valid_cites(q.get("citations"))
         # 答案以「卡上沒寫」開頭，或整句沒有任何有效引用卻含「卡上沒有」，才算答沒寫；
-        # 有引用的完整作答（只是順帶寫「卡上沒有說明某細節」）不算（第四次實跑的誤判）。
+        # 有引用的完整作答（只是順帶寫「卡上沒有說明某細節」）不算（會被字串比對誤判）。
         said_none = ans.strip().startswith(NO_ANSWER) or (any(n in ans for n in NO_ANSWER) and ok == 0)
         if i in trap_set:
             if not said_none:
