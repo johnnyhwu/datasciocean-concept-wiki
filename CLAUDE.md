@@ -45,7 +45,7 @@ blog 文章（blog/ submodule）──[Stage 1：提煉觀念]──> wiki/conce
 ```
 CLAUDE.md
 .claude/skills/distill-article/   Stage 1 的流程、腳本、審查者提示詞
-docs/                             card-format.md（契約，Stage 1 與 Stage 2 共用）、status.md（目前狀態）、stage1-token-usage.md（實跑的 token 紀錄）、guideline-for-downstream.md（附圖契約變更的交接說明，給下游 repo；下游同步完成後可刪）
+docs/                             card-format.md（契約，Stage 1 與 Stage 2 共用）、status.md（目前狀態）、stage1-token-usage.md（實跑的 token 紀錄）
 config/                           params.yaml、background-terms.md（人會改的放這裡）
 wiki/                             index.md（程式產生）、concepts/<id>.md、figures/<article>/（主張附的參考圖，從 blog 複製）
 blog/                             blog 的 submodule（唯讀）
@@ -57,7 +57,7 @@ tests/                            test_stage1_programs.py、fixtures/concepts/�
 ## 與下游 repo 的關係
 
 - 下游以 submodule 讀 `wiki/` 與 `docs/card-format.md`；下游看到的卡 = 你 commit 並 push 的版本。commit 與 push 由人決定時機，**不要自己 commit 或 push**。
-- 改 `docs/card-format.md`（欄位、狀態語意、錨點類型）等於改契約，要提醒人同步更新下游的 `cardlib.py` 與 `references/anchor-writing-rules.md`。下游還沒同步的契約變更，寫在 `docs/guideline-for-downstream.md`。
+- 改 `docs/card-format.md`（欄位、狀態語意、錨點類型）等於改契約，要提醒人同步更新下游的 `cardlib.py` 與 `references/anchor-writing-rules.md`。契約變更記在 `docs/status.md`，註明下游要同步什麼。
 - 新增錨點類型必須同時在下游定義 Stage 2 的寫法規則，否則不得新增。
 
 ## 目前狀態
