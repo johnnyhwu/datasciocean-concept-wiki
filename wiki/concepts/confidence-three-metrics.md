@@ -24,6 +24,7 @@ sources:
 parent: null
 related:
 - jev-cascade-overview
+- verifier-expected-value-vs-argmax
 status: active
 ---
 

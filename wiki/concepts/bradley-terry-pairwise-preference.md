@@ -15,6 +15,7 @@ parent: null
 related:
   - persona-d2s-training-design-flaws
   - decision-transformer-reward-conditioning
+  - verifier-expected-value-vs-argmax
 status: active
 ---
 

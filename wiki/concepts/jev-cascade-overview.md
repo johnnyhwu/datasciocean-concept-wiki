@@ -30,6 +30,7 @@ related:
 - cascade-complementary-errors
 - judge-readable-vs-derive
 - cascade-threshold-and-failure-mode
+- verifier-expected-value-vs-argmax
 status: active
 ---
 
