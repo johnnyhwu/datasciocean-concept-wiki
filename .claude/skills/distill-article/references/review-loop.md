@@ -7,7 +7,7 @@
    只看引文                   只看卡本身              讀整篇 blog，審這篇的所有卡
 ```
 
-為什麼這樣排：對證者只需要「卡加引用的原文」，輸入量小；卡穩定後才給讀者，讀者的結果不會因為對證者改卡而作廢（讀者與對證者同時跑時，讀者的 token 多半被後續改卡作廢）；整篇 blog 只在最後讀一次。
+對證者輸入量小，先把卡穩定下來；卡穩定後才給讀者，讀者結果才不會被改卡作廢；整篇 blog 只在最後讀一次。派發方式見 `dispatch-templates.md`。
 
 ## 共通機制
 
@@ -18,73 +18,59 @@
 | 只指出問題 | 退回清單每條含：卡上哪一句、違反哪種錯誤、原文對應。審查者不得替撰寫者寫句子 |
 | 撰寫者不能反駁 | 認為審查錯了，只能把該條標「爭議」交給人，立刻交，不等輪數用完 |
 | 補卡 | 審查者發現卡漏掉東西時，由撰寫者自己補（只能來自 blog）；補進去或改動的主張要再過對證者 |
-| 改動即失效 | 後面關卡看到的卡必須是「前面關卡通過的版本」。任何一關要求改卡 → `claim_fingerprints.py diff` 找出改過的主張 → 這些主張回到對證者重審 → 再重跑讀者 |
+| 改動即失效 | 任何一關要求改卡 → `claim_fingerprints.py diff` 找出改過的主張 → 回到對證者補審 → 需要時重跑讀者（見關卡 2 第 5 點） |
 | pending 主張不擋 | `pending_author_confirmation` 的主張必然含 blog 矛盾，它的問題只記錄，不計入通過條件 |
 | 輪數上限 | 用完仍有 blocker：停止，升級給人，附未解決的問題，**不自動放行** |
 
 ## 分級退回（blocker 與 minor）
-
-原本「任何一個原子不是完全支持就整張退回」，後面幾輪多為低價值的措辭退回，所以分級：
 
 | 等級 | 內容 | 結果 |
 |---|---|---|
 | **blocker** | 判定「不支持」「找不到」；固定錯誤：數字對不上、範圍被放大、因果說得比原文強、夾帶 blog 沒有的判斷、限定條件掉了、舉例變成唯一；卡標「官方宣稱」卻其實不是（錨點類型標錯） | 整張卡退回 |
 | **minor** | 主張與來源措辭不同、來源引用沒涵蓋但 blog 有支持、限定詞沒定義、相鄰錨點邊界爭議、主張互核矛盾（常是 blog 自己的）、審查者自己的引用錯誤、部分支持而無上列錯誤 | 只記錄在備註；撰寫者可順手修，不必修 |
 
-「預設不通過、引用必須逐字」的舉證責任不變，變的只是「什麼會擋下整張卡」。
+「預設不通過、引用必須逐字」的舉證責任不變，分級只決定什麼會擋下整張卡。
 
-## 關卡 1：對證者迴圈（`auditor_max_rounds`，預設 5）
+## 關卡 1：對證者迴圈（`auditor_max_rounds`）
 
-1. 產生對證者版卡：
-   `make_auditor_copy.py <card.md> <scratch>/<card>-aud.md`
-   主張後標 `[n]`，卡尾是參考文獻（blog 逐字原文）與引文所在的 blog 段落。`stage1.auditor_context: quote` 可改成只給引文（最省，但看不到前後句；斷章取義改由全文審查抓）。附圖的主張會列出圖檔路徑與 blog 圖說，對證者用 Read 看圖。
-2. 派全新 subagent，用 `auditor-prompt.md`，變數：`AUDITOR_COPY`、`OUT_PATH`、`ONLY_CLAIMS`（第 1 輪省略）。
-3. `verify_audit.py <card.md> <out.json> --copy <aud.md> [--only ids]`。有 blocker → 撰寫者修 → `validate_card.py` → 下一輪。附圖的主張，每張圖都要有 `figure_checks`：判定「一致」並寫出圖上位置與讀到的內容才算過；矛盾、不相關、看不清、漏核、沒寫位置都是 blocker（pending 主張不擋）。圖不是證據：主張的支持判定仍只看引文。
-4. 第 2 輪起只審「新增或改過的主張」：
-   - 通過的主張指紋**在 `verify_audit.py` 之後、改卡之前**立刻存起來：`claim_fingerprints.py save <accepted.json> <card.md> [--blockers c1,c2]`（改完才存，就找不出哪些主張改過；已經改過卡才想到要存，用 `save ... --blockers <改過的 id>` 只存沒改過的主張，改過的自然會出現在 diff）
-   - 下一輪：`claim_fingerprints.py diff <accepted.json> <card.md>` → 得到 id 清單 → `make_auditor_copy.py ... --only <ids>` → 提示詞的 `ONLY_CLAIMS` 填同一份清單 → `verify_audit.py ... --only <ids>`
+1. `make_auditor_copy.py <card.md> <scratch>/<card>/aud.md`：主張後標 `[n]`，卡尾是參考文獻（blog 逐字原文）與引文所在的段落；附圖的主張列出圖檔路徑與圖說，對證者用 Read 看圖。（`stage1.auditor_context: quote` 只給引文，最省但看不到前後句。）
+2. 派全新 subagent，用 `auditor-prompt.md`。
+3. `verify_audit.py <card.md> <out.json> --copy <aud.md> [--only ids]`。附圖的主張，每張圖都要有 `figure_checks` 判「一致」並寫出位置與讀到的內容；矛盾、不相關、看不清、漏核、沒寫位置都是 blocker（pending 主張不擋）。圖不是證據：支持判定只看引文。
+4. 有 blocker → **先存指紋再改卡**：`claim_fingerprints.py save <accepted.json> <card.md> --blockers <被擋的 id>`（已經改了卡才想到，`--blockers` 填改過的 id）→ 撰寫者修 → `validate_card.py` → 下一輪只審 `claim_fingerprints.py diff` 列出的主張（`make_auditor_copy.py --only`、提示詞的 `ONLY_CLAIMS`、`verify_audit.py --only` 用同一份清單）。
 5. 沒有 blocker → 過關。
-6. **補審合併派發**：同一輪要補審的多張卡，併成**一個** subagent（固定成本見 `SKILL.md`）：派發訊息列出每份副本的 `AUDITOR_COPY`、`OUT_PATH`、`ONLY_CLAIMS`，請它依序各審一份、各寫各的 JSON，不要把一份的原文拿去支持另一份。驗證仍用 `verify_audit.py` 逐卡跑。
+6. **補審合併派發**：同一輪要補審的多張卡併成**一個** subagent（範本見 `dispatch-templates.md` §2）。
 
 對證者**看不到整篇 blog**，所以「blog 其他段落的矛盾」「卡漏掉的重點」「跨卡矛盾」它抓不到，這些由關卡 3 負責。
 
-## 關卡 2：讀者迴圈（`reader_max_rounds`，預設 5）
+## 關卡 2：讀者迴圈（`reader_max_rounds`）
 
 讀者的設定：**懂一般 AI 工程詞彙、但沒讀過這篇 blog 的工程師。**
 
-1. `make_reader_copy.py <card.md> <scratch>/<card>-reader.md`：移除引用與參考文獻（`source_quotes`、`qualifiers[].source_quote`、sources 區）和參考圖（`figures`，讀者只看文字，才測得出主張有沒有自足）；卡若有「名詞補充」小節，原樣附在末尾。
-2. 撰寫者為每張卡出題：3 題確定在卡上有答案的專屬題（例如這個數字的比較對象是誰、限定條件是什麼、方法是誰提出的），加 1～2 題**陷阱題**（卡上確定沒有答案；從 blog 取一個卡沒收的事實）。陷阱題放最後，題號用 `--trap` 指定。**專屬題用卡上主張自己的措辭**，不要用卡上沒有的計數或標題字眼（例如卡上只列出幾個限制、沒寫「三個」，就別問「三個限制」），否則讀者答對也會被判「卡上沒寫」而誤退回。
+1. `make_reader_copy.py <card.md> <scratch>/<card>/reader.md`：移除引用、參考文獻與附圖（讀者只看文字，才測得出主張有沒有自足）；「名詞補充」小節原樣附在末尾。
+2. 撰寫者為每張卡出題：3 題確定在卡上有答案的專屬題（例如數字的比較對象、限定條件、方法是誰提出的），加 1～2 題**陷阱題**（卡上確定沒有答案；從 blog 取一個卡沒收的事實），陷阱題放最後。**專屬題用卡上主張自己的措辭**，不要用卡上沒有的計數或標題字眼（卡上只列出幾個限制、沒寫「三個」，就別問「三個限制」），否則讀者答對也會被判漏看。
 3. 派全新 subagent，用 `reader-prompt.md`。
-4. `verify_reader.py <reader-copy.md> <reader.json> --trap <題號...>`：
+4. `verify_reader.py <reader.md> <reader.json> --trap <題號...>`：
    - 主軸三題（論點、機制、證據）每題都要有「卡上真的存在」的引用；引用不出來就算需要外部知識，退回。
    - 專屬題：有答案卻答「卡上沒寫」→ 漏看，退回；硬答沒有有效引用 → 退回。
    - 陷阱題：硬答 → 退回；答「卡上沒寫」→ 通過。
    - 名詞：標「擋住主軸理解」才退回；其餘只是建議。
 5. **只動限定條件（`qualifiers`）或附圖（`figures`）、沒新增名詞或脈絡的改動，不必重跑讀者**；新增或改寫脈絡主張、定義、主張文字才重跑。
-6. 退回 → 撰寫者修卡（常是補脈絡主張或定義自創詞）→ `validate_card.py` → **改動的主張補審對證者**（`claim_fingerprints.py diff` → 關卡 1 的 `--only` 流程，這段補審另計，上限 `reader_edit_reaudit_max_rounds`，預設 2，超過交給人）→ 再跑讀者（算讀者輪數）。
+6. 退回 → 撰寫者修卡（常是補脈絡主張或定義自創詞）→ `validate_card.py` → 改動的主張補審對證者（上限 `reader_edit_reaudit_max_rounds`，超過交給人）→ 再跑讀者（算讀者輪數）。
 
-為什麼題目由撰寫者出：通用題（比較對象、限定條件）在沒有該項的卡上，「沒寫」是正確答案，程式不知道哪題真的沒有。已知缺點：題目由撰寫者出會削弱獨立性。
+題目由撰寫者出，是因為程式不知道哪題在這張卡上真的沒有答案；代價是獨立性稍弱。
 
-## 關卡 3：全文審查（`final_audit_max_rounds`，預設 2）
+## 關卡 3：全文審查（`final_audit_max_rounds`）
 
-一篇文章只做一次，在這篇所有卡的關卡 1、2 都通過之後。**一個**審查者讀整篇 blog，同時審這篇文章提煉出的所有卡，全文只讀一次。
+一篇文章一個審查者，在這篇所有卡的關卡 1、2 都通過之後，讀整篇 blog、同時審所有卡。
 
-1. 派全新 subagent，用 `final-audit-prompt.md`，變數：`BLOG_PATH`、`CARD_PATHS`、`OUT_PATH`。
+1. 派全新 subagent，用 `final-audit-prompt.md`。
 2. `verify_final_audit.py <final.json> <card.md>...`：
    - blocker：斷章取義；限定條件掉了；錨點歸屬錯（卡標官方宣稱時）。
-   - 交人裁決（exit 2）：跨卡矛盾、blog 內部矛盾。blog 內部矛盾照 `card-writing.md` §10 分類處理：真矛盾標 pending 再報告；措辭瑕疵由撰寫者用限定條件 resolve，報告裡列出供人推翻。
+   - 交人裁決（exit 2）：跨卡矛盾、blog 內部矛盾。blog 內部矛盾照 `card-writing.md` §10 分類處理（真矛盾標 pending；措辭瑕疵用限定條件 resolve），都列進報告供人推翻。
    - 只記錄：卡漏掉重點、其他錨點邊界、pending 主張的問題。
-3. 有 blocker → 撰寫者修 → 改動的主張補審對證者 → 再跑讀者（改動涉及主張內容時）→ 再跑一次全文審查（第 2 輪）。
-4. **第 2 輪之後的處理**：第 2 輪若仍有 blocker，修完並補審對證者後，由撰寫者判斷是否跑第 3 輪，**並向人報告理由**。可以不跑的條件：剩下的 blocker 全是「限定條件掉了」、跨卡矛盾為 0 筆、修改只補限定條件或標 pending、且改動的主張已逐條重審。blog 內部矛盾與跨卡矛盾仍一律交人。人要求時照跑。若跨卡矛盾的根源是 blog 自己的措辭（卡都照原文寫），交人決定處理方式（維持並在報告註記，或加限定條件）；人決定之後，該筆不再阻擋「不跑第 3 輪」的判斷。
-5. 全文審查是最貴的一關（要讀整篇 blog）；寫卡時照 `card-writing.md` §11 自檢，能讓它在第 1 輪就沒有「限定條件掉了」。
-
-## 執行細節
-
-- subagent 並行上限 20；分批派發，派完用檔案數核對應到／實到。
-- 審查產出放暫存目錄：`<scratch>/review/<card>/round<N>-auditor.json` 之類，不進 repo。
-- 讀者、對證者、全文審查者各自的輸出 JSON 格式見各提示詞。
-- 派發訊息只給提示詞路徑與變數，範本見 `dispatch-templates.md`；提示詞裡寫「只准讀這個檔案」指的是資料檔，提示詞檔本身當然要讀。
+3. 有 blocker → 撰寫者修 → 把這個限定條件補進 `limits.md`，並檢查同一列的其他主張也帶了 → 改動的主張補審對證者 → 再跑讀者（改動涉及主張內容時）→ 再跑一次全文審查（第 2 輪）。
+4. **第 2 輪之後**：仍有 blocker 時，修完並補審對證者後，由撰寫者判斷是否跑第 3 輪，**並向人報告理由**。可以不跑的條件：剩下的 blocker 全是「限定條件掉了」、跨卡矛盾為 0 筆、修改只補限定條件或標 pending、且改動的主張已逐條重審。人要求時照跑。跨卡矛盾的根源若是 blog 自己的措辭（卡都照原文寫），交人決定處理方式（維持並在報告註記，或加限定條件）；人決定之後，該筆不再阻擋「不跑第 3 輪」的判斷。
 
 ## 成本參考
 
-各次實跑的實測見 `docs/stage1-token-usage.md`。大致比例：對證者約五到六成、讀者約三成、全文審查約一成。
+實測見 `docs/stage1-token-usage.md`。近幾次（附圖、論文導讀型）的比例：對證者約五成、讀者兩到三成、全文審查兩到三成（每輪約 10 萬，隨 blog 長度增加）。最大的可省成本是全文審查第 2 輪與它帶來的補審（約 15～20 萬），靠 `card-writing.md` §11 的限定條件對照檔讓第 1 輪就沒有 blocker。

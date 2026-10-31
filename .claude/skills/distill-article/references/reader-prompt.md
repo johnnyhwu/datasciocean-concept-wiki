@@ -1,8 +1,7 @@
 # 獨立讀者提示詞（卡只靠自己能不能讀懂）
 
-用全新 subagent 執行。先用 `make_reader_copy.py` 產生讀者版卡（已移除引用與參考文獻），再把下列變數換成實際內容後整段交給它：`{READER_COPY}`、`{BACKGROUND_TERMS_PATH}`（固定是 `config/background-terms.md`）、`{OUT_PATH}`、`{CARD_SPECIFIC_QUESTIONS}`（3 題）、`{TRAP_QUESTIONS}`（1～2 題，接在專屬題後面）。訊息範本見 `dispatch-templates.md`。
+用全新 subagent 執行；變數與派發訊息見 `dispatch-templates.md` §3，出題規則見 `review-loop.md` 關卡 2。
 **不要附 blog、不要附撰寫者推理、不要附其他卡。**
-陷阱題是撰寫者出的「卡上沒有答案」的問題（用來測讀者會不會硬答），固定放在專屬題之後；驗證時 `verify_reader.py ... --trap <陷阱題的題號...>`，題號依全部題目的順序算（3 題專屬加 2 題陷阱就是 `--trap 4 5`）。
 
 ---
 

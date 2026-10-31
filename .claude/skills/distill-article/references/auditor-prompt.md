@@ -1,6 +1,6 @@
 # 對證者提示詞（引文對證，不讀整篇 blog）
 
-用全新 subagent 執行。先用 `make_auditor_copy.py` 產生對證者版卡，再把 `{AUDITOR_COPY}`、`{OUT_PATH}`、`{ONLY_CLAIMS}`（可省略）換成實際內容後整段交給它。
+用全新 subagent 執行；變數與派發訊息見 `dispatch-templates.md` §1、§2。
 **不要附撰寫者的任何推理、不要附其他卡、不要附上一輪的審查結果、不要給 blog 路徑。**
 
 ---

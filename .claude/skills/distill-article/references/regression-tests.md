@@ -8,19 +8,7 @@
 uv run python tests/test_stage1_programs.py
 ```
 
-涵蓋：
-
-| 範圍 | 測什麼 |
-|---|---|
-| `validate_card` 擋下 | 數字沒有比較對象、沒有脈絡主張、兩條 thesis、引文捏造、引文不在列出的小節、豁免卻含倍數、豁免理由不在清單、author_confirmed 沒日期、錨點類型不在清單、thesis 重要度、缺 article_title、article_title 與 blog 不符、小節不存在、related 指向不存在、id 與檔名不符、claim id 重複、沒有 claim |
-| `validate_card --claim-count` | 主張數低於下限、高於上限擋下；下限與上限本身放行；預設不檢查、加旗標才擋（旗標有接上） |
-| `validate_card` 放行（測誤殺） | `tests/fixtures/concepts/` 的每一張卡都必須通過（這是留作測試資料的 6 張卡，不屬於真實觀念庫） |
-| `make_auditor_copy` | 每條引文都能定位到段落；`--only` 只列其他主張文字；quote 模式沒有段落；不洩漏 url |
-| `verify_audit` | 全部完全支持通過；不支持、數字對不上、漏審擋下；措辭不同、部分支持、審查者捏造引用、其他錨點邊界、pending 主張的問題只記錄；卡標官方宣稱而錨點被判不支持擋下；`--copy` 越界讀 blog 列備註 |
-| 主張附圖 | `copy_figure` 複製並產生 sha256、`--indent` 縮排後仍是合法 YAML、blog 沒引用的檔名擋下；`validate_card` 擋下 figures 缺欄位、超過張數、article 不在 sources、路徑不符、src 不是 blog 引用的圖、caption 不一致、副檔名、sha256 與 blog 原圖不符（blog 改了圖）、wiki 內的圖被改過或不存在，放行正確的附圖與沒有附圖的主張；指向圖表字眼的 HINT（「上表現」不誤判）；孤兒圖；指紋隨附圖改變；限定條件引用圖說（`source: figure_caption`：放行；引文不在圖說、主張沒附圖、source 值非法、沒標來源卻引圖說都擋下；副本標示來源；`verify_audit` 拿圖說判完全支持擋下、判部分支持只記錄；`verify_final_audit` 接受審查者引用圖說）；對證者副本列出圖路徑與圖說、讀者副本不含附圖；`verify_audit` 的 figure_checks（一致且寫出位置與內容通過；矛盾、不相關、看不清、漏核、沒寫位置、判定值非法擋下；pending 主張不擋） |
-| `validate_card` 數字檢查 | 名稱標籤（Stage 3、Step 2、D2S、第 2 點、挑戰 5、§1）不算含數字；標籤旁有倍數仍擋下；「計數」豁免放行、含倍數仍擋下 |
-| `make_reader_copy`／`verify_reader` | 附上「名詞補充」小節、仍不洩漏引文；有引用的完整作答（順帶寫「卡上沒有說明…」）通過；專屬題答「卡上沒寫」判漏看；陷阱題硬答退回 |
-| `verify_final_audit` | 沒發現通過；斷章取義擋下；審查者引用不逐字、pending、卡漏掉重點只記錄；跨卡矛盾與 blog 矛盾 exit 2 |
+涵蓋 `scripts/` 的每支程式：每項檢查各有「故意做壞的版本」（必須擋下）與「正確的版本」（必須放行，測誤殺；`tests/fixtures/concepts/` 的每張卡都必須通過 `validate_card`）。測了什麼看執行輸出，每項一行 PASS／FAIL。新增檢查時，兩種版本都要加。
 
 ## 2. 審查者層（subagent，尚未自動化）
 
@@ -53,6 +41,6 @@ uv run python tests/test_stage1_programs.py
 ## 3. 未驗證事項
 
 - 對證者只看引文與段落（paragraph 模式）時，斷章取義的抓取率；quote 模式更低，要靠全文審查補。
-- 對證者讀圖的準確度（小字、密集表格、數字相近的欄）尚未量測；第一次附圖實跑時，人要抽查幾張「判一致」的圖，並記錄看不清的比例。
+- 對證者讀圖的準確度（小字、密集表格、數字相近的欄）尚未量測；兩次附圖實跑共 30 筆全判一致，人的抽查尚待。
 - 審查者之間可能有共同盲點（同一個模型）。人需偶爾冷讀抽查幾張卡，這是迴圈唯一的外部校準。
 - 對證者、讀者各 5 輪的上限是否足夠；5 輪後是否仍會在錨點邊界反覆翻轉。

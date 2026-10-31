@@ -13,20 +13,16 @@
 
 **提議由人確認後才寫入**，判斷錯誤會汙染整個 wiki。同一篇文章提煉出的卡之間：互設 `related`、不設 `parent`；有概覽或核心卡時，以它為中心與其餘各卡互設，其餘卡之間視關聯加設。
 
+`related` 用 `add_related.py` 寫，不手改：`add_related.py --mesh <id>...`（同篇兩兩互設）、`add_related.py <hub> <id>...`（hub 與各卡互設）。
+
 ## 2. 放行與寫入
 
-- 三關審查都通過、且沒有下列任何一項待人處理，就**直接寫入 wiki，不等人放行**：
-  - 去重或關係提議、
-  - 非基本的通用知識詞（背景詞清單以外、blog 也沒解釋；很基本的詞由撰寫者補在「名詞補充」，不算）、
-  - 爭議條目、
-  - 輪數用完仍有 blocker、
-  - 新增或變動的 `pending_author_confirmation`、任何 `author_confirmed`、
-  - 全文審查的「交人裁決」項目（跨卡矛盾、blog 內部矛盾）。
-- 有上列任何一項：先把這些項目整理成一份簡短清單問人，人回覆後再寫入。卡檔案此時已在 `wiki/concepts/`（未 commit）；這裡的「寫入」指人回覆後重建 index 並更新 `docs/status.md`。blog 內部矛盾不必等人回覆：真矛盾先標 pending；措辭瑕疵由撰寫者用限定條件 resolve（見 `card-writing.md` §10），兩者都在清單裡列出供人推翻。
+- 三關審查都通過、且 `SKILL.md`「必須停下來問人的情況」沒有任何一項待處理，就**直接寫入 wiki，不等人放行**。
+- 有待處理項目：先整理成一份簡短清單問人，人回覆後再寫入（重建 index、更新 `docs/status.md`）。blog 內部矛盾不必等回覆：照 `card-writing.md` §10 先處理，列在清單裡供人推翻。
 - 寫入前最後跑一次 `validate_card.py`（全部卡，不指定檔案：連同 `wiki/figures/` 的孤兒圖一起查）與 `build_index.py`。
 - 人確認的通用知識詞，若是一般性詞彙，加進 `config/background-terms.md`；MTok、rubric 這類在卡上只是引文單位或名稱標籤的，不加。
 
-寫入後，Stage 2 在另一個 repo（`datasciocean-social-media`）更新 submodule 才看得到新卡；本 repo 不知道、也不該知道 Stage 2 的狀態。要讓下游看到，需要在本 repo commit 並 push（commit 與 push 由人決定時機）。
+下游要等人 commit 並 push 後才看得到新卡。
 
 ## 3. 完成報告（給人看）
 
@@ -37,7 +33,7 @@
 - pending 與 author_confirmed 清單（含 blog 矛盾的具體內容，供人決定要不要修 blog）；
 - 通用知識詞與去重關係的處理結果；
 - 附圖清單（哪條主張附了哪張圖、為什麼有幫助），供人刪減；
-- 審查的 token 用量（subagent 回報的 usage 加總，按對證者、讀者、全文審查分開）——成本是主要痛點，每次都量，累積到 `docs/stage1-token-usage.md`。表格欄位：類別、subagent 個數、token、占比；另列「沒採用結果的 subagent」（重複派發、被併掉的卡的審查等）與哪些地方花得不合理。
+- 審查的 token 用量（subagent 回報的 usage 加總，按對證者、讀者、全文審查分開）——成本是主要痛點，每次都量，累積到 `docs/stage1-token-usage.md`。表格欄位：類別、subagent 個數、token、占比；另列「沒採用結果的 subagent」與哪些地方花得不合理；全文審查抓到的「限定條件掉了」，記下它屬於 `limits.md` 的哪一類、為什麼漏掉（用來改進對照檔的類型清單）。
 
 ## 4. blog 改了之後
 

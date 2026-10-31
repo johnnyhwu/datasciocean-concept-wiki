@@ -2,10 +2,11 @@
 
 四種審查者共通的做法：
 
-- 一律用 `Agent` 派 `general-purpose`、`run_in_background: true`、**全新** subagent；訊息只給提示詞路徑與變數，不貼提示詞全文、不附撰寫者推理或其他卡。
+- 一律用 `Agent` 派 `general-purpose`、`run_in_background: true`、**全新** subagent；訊息只給提示詞路徑與變數，不貼提示詞全文、不附撰寫者推理或其他卡。提示詞裡「只准讀這個檔案」指資料檔，提示詞檔本身當然要讀。
 - 提示詞檔在 `.claude/skills/distill-article/references/`；訊息裡的路徑一律用絕對路徑。
-- 下面的 `S` 是本次工作 scratchpad 裡的 `review/`；每張卡一個子資料夾：`S/<card>/aud.md`、`round<N>-auditor.json`、`reader.md`、`round<N>-reader.json`；全文審查放 `S/final/`。
-- 完成通知到了，**用對應的 `verify_*.py` 驗證**，不要直接採信 subagent 回報的摘要。派完用檔案數核對應到／實到。
+- 下面的 `S` 是本次工作 scratchpad 裡的 `review/`（不進 repo）；每張卡一個子資料夾：`S/<card>/aud.md`、`round<N>-auditor.json`、`reader.md`、`round<N>-reader.json`；全文審查放 `S/final/`；限定條件對照檔是 `S/limits.md`。
+- 並行上限 20，派不完就分批。完成通知到了，**用對應的 `verify_*.py` 驗證**，不要直接採信 subagent 回報的摘要；派完用檔案數核對應到／實到。
+- **每個 subagent 約有 40k 的固定成本**（讀提示詞與檔案），即使只審 1 條主張。所以同一輪能一起改完的主張湊齊再補審，多張卡併成一個 subagent（§2）。
 
 ## 1. 對證者
 
@@ -33,7 +34,7 @@
 除提示詞檔與這些 AUDITOR_COPY 外，不准讀其他檔案。
 ```
 
-驗證逐份跑，`--only` 與派發的清單相同。固定成本約 40k，所以把同一輪能一起改完的主張湊齊再補審，不要改一條補審一次。
+驗證逐份跑，`--only` 與派發的清單相同。
 
 ## 3. 讀者
 

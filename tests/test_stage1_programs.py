@@ -2,7 +2,7 @@
 
 用法（repo 根目錄）：uv run python tests/test_stage1_programs.py
 範圍：validate_card（結構與逐字比對）、主張附圖（copy_figure、validate_card 的 figures 檢查、孤兒圖、指紋）、
-make_auditor_copy（引文都能定位）、make_reader_copy、verify_reader、verify_audit 與 verify_final_audit（分級規則）。審查者（subagent）本身的嚴格度不在這裡測，見
+make_auditor_copy（引文都能定位）、make_reader_copy、verify_reader、verify_audit 與 verify_final_audit（分級規則）、add_related。審查者（subagent）本身的嚴格度不在這裡測，見
 .claude/skills/distill-article/references/regression-tests.md。
 修改任何程式檢查或審查流程後，要重跑這份。
 """
@@ -25,6 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 os.environ["DSO_CARDS_DIR"] = str(ROOT / "tests" / "fixtures" / "concepts")
 sys.path.insert(0, str(ROOT / ".claude/skills/distill-article/scripts"))
 
+import add_related as AR  # noqa: E402
 import claim_fingerprints as CF  # noqa: E402
 import copy_figure as CP  # noqa: E402
 import make_auditor_copy as MAC  # noqa: E402
@@ -558,6 +559,36 @@ with tempfile.TemporaryDirectory() as _tmp:
     rc, out = run_cap_final("捏造的圖說內容")
     check("verify_final_audit：引用不在 blog 也不在圖說 → 只記錄", rc == 0, out[:200])
     W.WIKI_DIR = _real_wiki
+
+# --- add_related：雙向寫入 related，沿用原本的縮排，其他文字不動 ---
+_HEAD = "---\nid: {id}\ntitle: t\n{rel}status: active\n---\n\n## 主張\n\nbody {id}\n"
+with tempfile.TemporaryDirectory() as _tmp:
+    _real_cards = W.CARDS_DIR
+    W.CARDS_DIR = Path(_tmp)
+    for cid, rel in [("a", "related:\n  - x\n"), ("b", "related: []\n"), ("c", "related:\n- y\n"),
+                     ("d", "related: [x]\n"), ("x", "related: []\n"), ("y", "related: []\n")]:
+        (Path(_tmp) / f"{cid}.md").write_text(_HEAD.format(id=cid, rel=rel), encoding="utf-8")
+
+    def rel_of(cid: str) -> list:
+        return W.parse_card(Path(_tmp) / f"{cid}.md").front.get("related")
+
+    with contextlib.redirect_stdout(io.StringIO()):
+        rc = AR.main(["a", "b", "c"])
+    check("add_related：hub 模式雙向寫入", rc == 0 and rel_of("a") == ["x", "b", "c"]
+          and rel_of("b") == ["a"] and rel_of("c") == ["y", "a"], str([rel_of(i) for i in "abc"]))
+    _a = (Path(_tmp) / "a.md").read_text(encoding="utf-8")
+    _c = (Path(_tmp) / "c.md").read_text(encoding="utf-8")
+    check("add_related：沿用原本的清單縮排（兩格與不縮排）", "  - b\n" in _a and "\n- a\n" in _c, _a + _c)
+    check("add_related：其餘文字不動", _a.endswith("status: active\n---\n\n## 主張\n\nbody a\n"), _a)
+    with contextlib.redirect_stdout(io.StringIO()):
+        AR.main(["--mesh", "b", "c", "d"])
+        AR.main(["--mesh", "b", "c", "d"])
+    check("add_related：mesh 兩兩互設、重跑不重複、flow 寫法改成清單", rel_of("b") == ["a", "c", "d"]
+          and rel_of("d") == ["x", "b", "c"], str([rel_of(i) for i in "bcd"]))
+    with contextlib.redirect_stdout(io.StringIO()):
+        rc = AR.main(["a", "no-such-card"])
+    check("add_related：卡不存在 → 不寫入", rc == 1 and rel_of("a") == ["x", "b", "c"])
+    W.CARDS_DIR = _real_cards
 
 print(f"\n{'全部通過' if not fails else f'{len(fails)} 項失敗：' + '; '.join(fails)}")
 sys.exit(1 if fails else 0)
