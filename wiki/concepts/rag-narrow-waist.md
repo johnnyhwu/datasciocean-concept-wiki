@@ -19,6 +19,7 @@ related:
   - rrf-rank-fusion
   - rag-planner-single-round-vs-agentic
   - retrieval-reasoning-decoupling
+  - universalrag-routing-over-unified-embedding
 status: active
 ---
 

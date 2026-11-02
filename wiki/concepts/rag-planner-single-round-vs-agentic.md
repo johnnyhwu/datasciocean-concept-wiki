@@ -21,6 +21,7 @@ related:
   - retrieval-reasoning-decoupling
   - rrf-rank-fusion
   - rag-narrow-waist
+  - universalrag-router-design-and-rollout
 status: active
 ---
 

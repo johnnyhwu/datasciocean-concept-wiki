@@ -20,6 +20,7 @@ related:
   - rag-planner-single-round-vs-agentic
   - rag-narrow-waist
   - sag-sql-vector-llm-division-and-funnel
+  - universalrag-routing-over-unified-embedding
 status: active
 ---
 
