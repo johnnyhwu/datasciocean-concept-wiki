@@ -26,6 +26,7 @@ related:
 - bradley-terry-pairwise-preference
 - confidence-three-metrics
 - jev-cascade-overview
+- cer-critical-token-confidence
 status: active
 ---
 

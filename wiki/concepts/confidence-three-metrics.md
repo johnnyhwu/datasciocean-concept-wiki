@@ -25,6 +25,7 @@ parent: null
 related:
 - jev-cascade-overview
 - verifier-expected-value-vs-argmax
+- cer-process-confidence-weighted-voting
 status: active
 ---
 
