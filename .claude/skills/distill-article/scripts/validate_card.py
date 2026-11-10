@@ -56,12 +56,15 @@ def check_figures(c: dict, tag: str, slugs: set[str], blogs: dict, params: dict,
         ext = Path(src).suffix.lower()
         if ext not in set(params["wiki"]["figure_extensions"]):
             err.append(f"{label}：副檔名 {ext!r} 不在 wiki.figure_extensions 內")
-        img = next((i for i in W.blog_images(blog) if i["src"] == src), None)
-        if img is None:
+        # 同一張圖在 blog 可能出現多次、各有不同圖說：caption 只要與其中一處一致即可
+        same_src = [i for i in W.blog_images(blog) if i["src"] == src]
+        if not same_src:
             err.append(f"{label}：blog 內文沒有 image shortcode 引用 {src!r}")
             continue
-        if W.normalize(f["caption"]) != W.normalize(img["caption"]):
+        img = next((i for i in same_src if W.normalize(f["caption"]) == W.normalize(i["caption"])), None)
+        if img is None:
             err.append(f"{label}：caption 與 blog 的圖說不一致")
+            img = same_src[0]
         if img["section"] and section_norms and W.normalize(img["section"]) not in section_norms:
             hint.append(f"{label}：圖所在小節 {img['section']!r} 不在 sources.sections 內（交對證者判斷相關性）")
         original = blog.path.parent / src

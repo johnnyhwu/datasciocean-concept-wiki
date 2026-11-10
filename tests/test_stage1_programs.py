@@ -423,6 +423,17 @@ with tempfile.TemporaryDirectory() as _tmp:
         out = fig_errors(fc)
         check(f"validate 擋下：{name}", expect in out, f"預期含 {expect!r}，實際：{out[:200]!r}")
 
+    # 同一張圖在 blog 出現兩次、圖說不同：caption 與任一處一致就放行，兩處都不一致仍擋下
+    _real_blog_images = W.blog_images
+    W.blog_images = lambda b: [{**_fig_img, "caption": "另一處的不同圖說"}] + _real_blog_images(b)
+    try:
+        check("validate 放行（測誤殺）：同一張圖出現兩次，caption 對上第二處的圖說", not fig_errors(fig_card(good_fig)),
+              fig_errors(fig_card(good_fig))[:300])
+        check("validate 擋下：同一張圖出現兩次，caption 兩處都對不上",
+              "caption 與 blog 的圖說不一致" in fig_errors(with_fig(caption="兩處都沒有的圖說")))
+    finally:
+        W.blog_images = _real_blog_images
+
     _backup = _dest.read_bytes()
     _dest.write_bytes(_backup + b"tampered")
     check("validate 擋下：wiki 內的圖被改過", "wiki 裡的圖與記錄的 sha256 不符" in fig_errors(fig_card(good_fig)))
