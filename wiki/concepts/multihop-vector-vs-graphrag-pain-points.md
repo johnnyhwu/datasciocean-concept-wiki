@@ -15,6 +15,8 @@ sources:
 parent: null
 related:
 - sag-latent-hyperedge-one-hop
+- ragu-results-peeling-confounds
+- ragu-pipeline-two-stage-extraction-consolidation
 status: active
 ---
 
