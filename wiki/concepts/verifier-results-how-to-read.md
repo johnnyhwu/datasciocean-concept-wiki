@@ -23,6 +23,7 @@ related:
 - verifier-expected-value-vs-argmax
 - verifier-three-knobs-g-k-c
 - ppt-pivot-tournament
+- decisionrag-results-gain-source
 status: active
 ---
 

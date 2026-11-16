@@ -28,6 +28,7 @@ related:
   - ragu-pipeline-two-stage-extraction-consolidation
   - multihop-vector-vs-graphrag-pain-points
   - sag-results-and-gain-source
+  - decisionrag-results-gain-source
 status: active
 ---
 

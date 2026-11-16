@@ -24,6 +24,8 @@ parent: null
 related:
   - universalrag-routing-over-unified-embedding
   - rag-planner-single-round-vs-agentic
+  - decisionrag-tree-navigation-decision-model
+  - tree-routing-bounded-by-node-descriptions
 status: active
 ---
 

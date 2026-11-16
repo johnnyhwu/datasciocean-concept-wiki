@@ -22,6 +22,8 @@ related:
   - rrf-rank-fusion
   - rag-narrow-waist
   - universalrag-router-design-and-rollout
+  - decisionrag-tree-navigation-decision-model
+  - tree-routing-bounded-by-node-descriptions
 status: active
 ---
 
