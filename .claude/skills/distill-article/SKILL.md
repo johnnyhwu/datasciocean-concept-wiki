@@ -16,7 +16,7 @@ description: 把 DataSci Ocean 的一篇 blog 文章提煉成觀念卡（Stage 1
 ## 流程
 
 ```
-[1] 讀文章 → [2] 挖候選 → [3] 篩選與合併 → [3.5] 給人看提案（人刪、併、改）
+[1] 讀文章 → [2] 挖候選 → [3] 篩選與合併 → [3.5] 提案定案（記進報告，不等人）
  → [4] 建限定條件對照檔 → 寫卡 → 自檢 → [5] 程式檢查（加 --claim-count）
  → [6] 對證者迴圈 → [7] 讀者迴圈 → [8] 全文審查 → [9] 去重與關係 → [10] 寫入 wiki、報告
 ```
@@ -27,7 +27,7 @@ description: 把 DataSci Ocean 的一篇 blog 文章提煉成觀念卡（Stage 1
 
 | 步驟 | 做什麼 | 細節在 |
 |---|---|---|
-| 2–3.5 | 依優先順序挖候選；五個篩選測試；合併規則 R1–R6；**給人看提案**（id、一句話論點、主要錨點、合併或淘汰理由、圖與表的範圍檢查），等人回覆才寫卡。提案階段不看主張數 | `references/mining-and-filtering.md` |
+| 2–3.5 | 依優先順序挖候選；五個篩選測試；合併規則 R1–R6；**提案定案**（id、一句話論點、主要錨點、合併或淘汰理由、圖與表的範圍檢查），記進完成報告，直接寫卡。提案階段不看主張數 | `references/mining-and-filtering.md` |
 | 4 | 先在 scratchpad 建 `review/limits.md`（整篇 blog 的打折、例外、反駁、概括數字），再寫卡；寫完逐列對照檔並自檢；主張用得到的 blog 圖就附上（`copy_figure.py`） | `references/card-writing.md`（對照檔與自檢見 §11，附圖見 §12） |
 | 5 | `validate_card.py <card.md> --claim-count`：結構、引文逐字、附圖、主張數 10 到 20，直到 PASS | `docs/card-format.md` §8 |
 | 6 | 對證者：只看「卡加引用與所在段落」，附圖的主張另外看圖核對 | `references/review-loop.md`、`references/auditor-prompt.md` |
@@ -37,19 +37,30 @@ description: 把 DataSci Ocean 的一篇 blog 文章提煉成觀念卡（Stage 1
 
 派發審查者的訊息範本、暫存路徑、固定成本與合併補審：`references/dispatch-templates.md`。
 
-## 必須停下來問人的情況
+## 誰做決定（2026-11-15 起）
 
-不確定就問，不自己決定。至少包括：
+人挑好文章之後，撰寫者**一路做到寫入 wiki**，中間的判斷自己做，不停下來問；只有下面「嚴重的問題」才停。自己做的每個決定都寫進完成報告（`references/release.md` §3），讓人事後推翻。
 
-- **寫卡前的提案清單**（哪些觀念要寫、哪些合併或淘汰），人確認後才寫卡。
-- 去重與關係提議（重複、實例、相關、全新）。
-- blog 內部矛盾（含圖與文字對不上）：預設不修 blog；真矛盾先標 `pending_author_confirmation`，措辭瑕疵由撰寫者用限定條件 resolve，兩者都列給人可推翻（`card-writing.md` §10）。
-- 背景詞清單以外、blog 也沒解釋、且**不是很基本**的「通用知識」詞（很基本的詞補在卡的「名詞補充」小節，不必問，見 `card-writing.md` §7）。
-- 審查者與撰寫者的爭議條目（撰寫者不能反駁審查者，只能標爭議）。
-- 輪數用完仍有 blocker。
-- 新增或變動的 `pending_author_confirmation` 主張；任何 `author_confirmed`。
+**撰寫者自己決定，照預設做法處理，事後報告：**
 
-以上都沒有、且三關都通過 → 直接寫入 wiki，不必等人放行。完成後給人一份報告（`references/release.md` §3）。
+| 事項 | 預設做法 |
+|---|---|
+| 提案（哪些觀念要寫、合併或淘汰） | 照 `mining-and-filtering.md` 的規則定案就寫卡，提案清單放進完成報告 |
+| 去重與關係 | 照 `release.md` §1 判斷；同篇互設 `related`，與既有卡只設 `related` |
+| blog 內部矛盾（含圖與文字對不上） | 照 `card-writing.md` §10：真矛盾標 `pending_author_confirmation`，措辭瑕疵用限定條件 resolve |
+| 新增或變動的 `pending_author_confirmation` | 照上一列標，報告列出 |
+| 非基本的通用知識詞 | 不用自己的知識補（CLAUDE.md 規則 1 不變）：改寫成不依賴它、取 blog 的說法，或不收那條主張；很基本的詞照 `card-writing.md` §7 補在「名詞補充」 |
+| 審查者與撰寫者的爭議 | 撰寫者仍不能反駁審查者：照審查者的意見改，改不了就刪掉那條或標 pending，取保守的一邊 |
+| 全文審查第 2 輪之後要不要跑第 3 輪、跨卡矛盾的處理 | 照 `review-loop.md` 關卡 3 的條件判斷 |
+
+**嚴重的問題，停下來問人：**
+
+- 輪數用完仍有 blocker（不降低標準、不自動放行）。
+- 主軸（thesis）本身要標 pending，或 blog 的問題大到整張卡撐不住。
+- 要改動其他文章的既有卡的主張（例如判為「重複」、要合併進既有卡）；只加 `related` 不算。
+- 任何 `author_confirmed`（只有作者能確認）。
+- 要改契約（`docs/card-format.md`）、`config/background-terms.md` 或流程腳本才走得下去。
+- 撰寫者判斷某件事風險高、做錯會汙染 wiki，而上面的預設做法不適用。
 
 ## 腳本（`scripts/`）
 
