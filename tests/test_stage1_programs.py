@@ -246,9 +246,9 @@ check("final audit：pending 主張的問題不擋（測誤殺）", rc == 0)
 rc, _ = run_final({**base, "findings": [{"card_id": GOOD.front["id"], "claim_ids": ["c1"], "type": "卡漏掉重點", "blog_quote": REAL_Q, "note": "x"}]})
 check("final audit：卡漏掉重點 → 只記錄", rc == 0)
 rc, _ = run_final({**base, "cross_card_conflicts": [{"items": [], "note": "x"}]})
-check("final audit：跨卡矛盾 → 交人裁決（exit 2）", rc == 2)
+check("final audit：跨卡矛盾 → 撰寫者裁決（exit 2）", rc == 2)
 rc, _ = run_final({**base, "blog_internal_contradictions": [{"description": "x", "quotes": [REAL_Q], "related": []}]})
-check("final audit：blog 內部矛盾 → 交人裁決（exit 2）", rc == 2)
+check("final audit：blog 內部矛盾 → 撰寫者裁決（exit 2）", rc == 2)
 
 
 # ---------------------------------------------------------------- 5. 數字檢查：名稱標籤與「計數」豁免

@@ -6,9 +6,9 @@
 用法：uv run python .claude/skills/distill-article/scripts/verify_final_audit.py <final.json> <card.md> [<card.md> ...]
 分級（沿用 verify_audit.py 的原則）：
   擋下（blocker）：type 為「斷章取義」「限定條件掉了」，或「錨點歸屬錯」且該主張標「官方宣稱」。
-  交人裁決（escalate）：跨卡矛盾、blog 內部矛盾（卡要不要用保守寫法由人決定）。
+  撰寫者裁決（escalate）：跨卡矛盾、blog 內部矛盾（照 SKILL.md「誰做決定」處理，寫進完成報告）。
   只記錄（minor）：卡漏掉重點、其他錨點邊界、pending 主張的問題、審查者引用錯誤。
-結束碼：0 通過、1 有 blocker、2 沒有 blocker 但有要交人裁決的項目。
+結束碼：0 通過、1 有 blocker、2 沒有 blocker 但有要撰寫者裁決的項目。
 """
 from __future__ import annotations
 
@@ -62,12 +62,12 @@ def main(final_path: str, card_paths: list[str]) -> int:
         flag = "（含未逐字的引用，需人工確認）" if bad else ""
         escalate.append(f"blog 內部矛盾{flag}：{x.get('description','')[:120]} 相關 {x.get('related')}")
 
-    print(f"== 全文審查 {slugs}: {'退回' if blockers else ('交人裁決' if escalate else '通過')}"
-          f"（blocker {len(blockers)}，交人 {len(escalate)}，備註 {len(notes)}）")
+    print(f"== 全文審查 {slugs}: {'退回' if blockers else ('撰寫者裁決' if escalate else '通過')}"
+          f"（blocker {len(blockers)}，裁決 {len(escalate)}，備註 {len(notes)}）")
     for b in blockers:
         print("  BLOCKER", b)
     for e in escalate:
-        print("  交人", e)
+        print("  裁決", e)
     for n in notes:
         print("  備註", n)
     return 1 if blockers else (2 if escalate else 0)
