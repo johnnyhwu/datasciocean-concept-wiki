@@ -29,6 +29,7 @@ related:
   - multihop-vector-vs-graphrag-pain-points
   - sag-results-and-gain-source
   - decisionrag-results-gain-source
+  - jevact-results-gain-source
 status: active
 ---
 

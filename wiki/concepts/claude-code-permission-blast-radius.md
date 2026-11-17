@@ -17,6 +17,7 @@ parent: null
 related:
   - claude-code-agentic-loop-and-tools
   - claude-code-extension-and-context
+  - jevact-pre-execution-gate
 status: active
 ---
 

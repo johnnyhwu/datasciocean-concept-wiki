@@ -31,6 +31,7 @@ related:
 - judge-readable-vs-derive
 - cascade-threshold-and-failure-mode
 - verifier-expected-value-vs-argmax
+- jevact-pre-execution-gate
 status: active
 ---
 

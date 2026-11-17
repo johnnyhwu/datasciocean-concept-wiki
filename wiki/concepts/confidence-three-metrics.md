@@ -27,6 +27,7 @@ related:
 - verifier-expected-value-vs-argmax
 - cer-process-confidence-weighted-voting
 - shared-context-batched-judgments
+- jevact-pre-execution-gate
 status: active
 ---
 
