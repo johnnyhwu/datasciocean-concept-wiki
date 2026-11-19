@@ -26,6 +26,7 @@ related:
   - rag-planner-single-round-vs-agentic
   - decisionrag-tree-navigation-decision-model
   - tree-routing-bounded-by-node-descriptions
+  - jevmem-read-plan-expand-stop
 status: active
 ---
 

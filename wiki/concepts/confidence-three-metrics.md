@@ -28,6 +28,7 @@ related:
 - cer-process-confidence-weighted-voting
 - shared-context-batched-judgments
 - jevact-pre-execution-gate
+- jevmem-small-scorer-controls-memory
 status: active
 ---
 

@@ -34,6 +34,7 @@ related:
   - decisionrag-speedup-deployment-fairness
   - rag-planner-single-round-vs-agentic
   - universalrag-router-design-and-rollout
+  - jevmem-small-scorer-controls-memory
 status: active
 ---
 

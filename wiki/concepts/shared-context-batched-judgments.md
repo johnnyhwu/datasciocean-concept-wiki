@@ -22,6 +22,7 @@ related:
   - decisionrag-speedup-deployment-fairness
   - verifier-expected-value-vs-argmax
   - confidence-three-metrics
+  - jevmem-small-scorer-controls-memory
 status: active
 ---
 
