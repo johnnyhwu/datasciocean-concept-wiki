@@ -18,6 +18,7 @@ related:
   - claude-code-agentic-loop-and-tools
   - claude-code-extension-and-context
   - jevact-pre-execution-gate
+  - judgment-skill-hard-rules-tool-code
 status: active
 ---
 

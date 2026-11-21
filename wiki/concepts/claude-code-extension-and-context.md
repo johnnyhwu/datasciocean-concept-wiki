@@ -23,6 +23,8 @@ related:
   - claude-code-permission-blast-radius
   - clm-context-as-editable-file
   - context-chunk-keep-offload-compress-delete
+  - single-loop-progressive-disclosure
+  - subagent-boundary-lossy-handoff
 status: active
 ---
 

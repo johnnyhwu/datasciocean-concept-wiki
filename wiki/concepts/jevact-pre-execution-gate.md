@@ -29,6 +29,7 @@ related:
   - claude-code-permission-blast-radius
   - jev-cascade-overview
   - confidence-three-metrics
+  - judgment-skill-hard-rules-tool-code
 status: active
 ---
 

@@ -19,6 +19,7 @@ parent: null
 related:
   - claude-code-extension-and-context
   - claude-code-permission-blast-radius
+  - single-loop-progressive-disclosure
 status: active
 ---
 

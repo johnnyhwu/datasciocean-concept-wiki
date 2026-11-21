@@ -29,6 +29,7 @@ related:
   - jevact-results-gain-source
   - policy-checks-blind-to-user-request
   - judge-readable-vs-derive
+  - judgment-skill-hard-rules-tool-code
 status: active
 ---
 

@@ -25,6 +25,7 @@ related:
   - decisionrag-tree-navigation-decision-model
   - universalrag-router-design-and-rollout
   - rag-planner-single-round-vs-agentic
+  - single-loop-progressive-disclosure
 status: active
 ---
 
