@@ -65,6 +65,11 @@
 
 （Rollout、minibatch、MapReduce、EMA 沒加：卡上直接取 blog 的解釋來定義。）
 
+**第十七次實跑（context-language-models）後經人確認加入**
+- harness（包在模型外面、負責呼叫工具、管理 context、送出提醒的那層程式）
+
+（三位讀者都標出 harness 沒定義；清單內的詞仍適用使用規則第二條：卡的主軸就是 harness 本身時，卡上仍要解釋。）
+
 ## 刻意不放的詞（需要在卡上解釋）
 
 - RLHF、RLVR、reward model、proper scoring rule、KV cache、constrained decoding、Bradley-Terry
