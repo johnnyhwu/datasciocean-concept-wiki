@@ -33,6 +33,7 @@ related:
   - skillopt-bounded-edit-budget
   - skillopt-blind-acceptance-gate
   - skillopt-epoch-level-control
+  - clm-text-steering-and-skill-evolution
 status: active
 ---
 

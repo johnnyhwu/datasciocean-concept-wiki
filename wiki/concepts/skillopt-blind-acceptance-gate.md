@@ -22,6 +22,7 @@ related:
   - skillopt-overview
   - skillopt-bounded-edit-budget
   - skillopt-epoch-level-control
+  - clm-text-steering-and-skill-evolution
 status: active
 ---
 
