@@ -626,5 +626,32 @@ with tempfile.TemporaryDirectory() as _tmp:
     check("add_related：卡不存在 → 不寫入", rc == 1 and rel_of("a") == ["x", "b", "c"])
     W.CARDS_DIR = _real_cards
 
+# ---------------------------------------------------------------- 指紋快照與跨卡錨點一致
+with tempfile.TemporaryDirectory() as _tmp:
+    card_path = Path(_tmp) / f"{GOOD.front['id']}.md"
+    write_card_file(copy.deepcopy(GOOD), card_path)
+    aud = Path(_tmp) / "aud.md"
+    with contextlib.redirect_stdout(io.StringIO()):
+        MAC.main(str(card_path), str(aud), None, 0, "paragraph")
+    snap_path = Path(str(aud) + ".fp.json")
+    check("auditor copy：寫出送審指紋快照", snap_path.exists() and len(json.loads(snap_path.read_text())) == len(GOOD.claims))
+    edited = copy.deepcopy(GOOD)
+    first = edited.claims[0]["id"]
+    edited.claims[0]["anchor_type"] = "部落格判斷" if edited.claims[0]["anchor_type"] != "部落格判斷" else "部落格推論"
+    write_card_file(edited, card_path)
+    acc = Path(_tmp) / "acc.json"
+    with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+        CF.main(["save", str(acc), str(card_path), "--snapshot", str(snap_path)])
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(io.StringIO()):
+        CF.main(["diff", str(acc), str(card_path)])
+    check("指紋快照：送審後才改的主張（只改錨點）不會被存成通過", buf.getvalue().strip() == first, buf.getvalue())
+
+    a, b = copy.deepcopy(GOOD), copy.deepcopy(GOOD)
+    b.front["id"] = "other-card"
+    check("跨卡錨點：引文相同、錨點一致 → 不報（測誤殺）", VC.anchor_conflicts([a, b]) == [])
+    b.claims[0]["anchor_type"] = edited.claims[0]["anchor_type"]
+    check("跨卡錨點：引文相同、錨點不同 → 報出", len(VC.anchor_conflicts([a, b])) == 1, str(VC.anchor_conflicts([a, b])))
+
 print(f"\n{'全部通過' if not fails else f'{len(fails)} 項失敗：' + '; '.join(fails)}")
 sys.exit(1 if fails else 0)

@@ -66,11 +66,11 @@ description: 把 DataSci Ocean 的一篇 blog 文章提煉成觀念卡（Stage 1
 
 | 腳本 | 用途 |
 |---|---|
-| `validate_card.py` | 結構驗證加引文逐字比對、附圖檢查（不指定檔案時驗全部卡並查孤兒圖）；`--claim-count` 另查主張數；HINT 提示主張有、引文沒有的因果與範圍詞 |
+| `validate_card.py` | 結構驗證加引文逐字比對、附圖檢查、同篇卡之間引文相同的主張錨點要一致（不指定檔案時驗全部卡並查孤兒圖）；`--claim-count` 另查主張數；HINT 提示主張有、引文沒有的因果與範圍詞 |
 | `copy_figure.py` | 把 blog 的一張圖複製進 `wiki/figures/<article>/`，印出可貼進主張 `figures` 的 YAML（`--indent N` 對齊縮排） |
-| `make_auditor_copy.py` | 產生對證者版卡（`--only` 只審改動的主張） |
+| `make_auditor_copy.py` | 產生對證者版卡（`--only` 只審改動的主張），並寫出送審指紋快照 `<out>.fp.json` |
 | `verify_audit.py` | 驗證對證者 JSON：引用逐字、分級、附圖的 figure_checks |
-| `claim_fingerprints.py` | 主張指紋：`save` 存已通過的、`diff` 列出新增或改過的 |
+| `claim_fingerprints.py` | 主張指紋：`save --snapshot` 存送審時已通過的、`diff` 列出新增或改過的 |
 | `make_reader_copy.py` | 產生讀者版卡（移除引用、參考文獻與附圖，保留「名詞補充」） |
 | `verify_reader.py` | 驗證讀者 JSON |
 | `verify_final_audit.py` | 驗證全文審查 JSON |

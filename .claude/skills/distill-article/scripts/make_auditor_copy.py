@@ -9,6 +9,7 @@
         [--context paragraph|quote]   引文帶出所在段落（預設，取 params 的 stage1.auditor_context）
                             或只給引文本身（最省，但對證者看不到前後句）
         [--neighbors N]     paragraph 模式下，每個引文段落前後各多帶 N 段（預設 0）
+另外寫出 <out.md>.fp.json：送審主張當下的指紋快照，給 `claim_fingerprints.py save --snapshot` 用。
 
 主張附的參考圖（figures）列出圖檔絕對路徑與 blog 圖說，供對證者用 Read 看圖、核對主張與圖有沒有矛盾；
 圖與圖說都不是主張的支持依據（支持依據只有引文）；唯一例外是標明「來源：圖說」的限定條件，只用來交代範圍、資料集、設定。
@@ -18,11 +19,13 @@
 """
 from __future__ import annotations
 
+import json
 import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+import claim_fingerprints as CF
 import wikilib as W
 
 HIDE_CLAIM_KEYS = {"source_quotes", "importance"}
@@ -189,6 +192,10 @@ def main(card_path: str, out_path: str, only: set[str] | None, neighbors: int, c
             b = block_sets[key[0]][key[1]]
             lines += [f"### P{p}（小節：{b.heading or '（無標題）'}）", "", b.raw, ""]
     Path(out_path).write_text("\n".join(lines), encoding="utf-8")
+    # 送審當下的指紋快照：之後 `claim_fingerprints.py save --snapshot` 只存「真的送審過」的版本，
+    # 審完才改的主張不會被誤存成已通過。
+    snap = {c["id"]: CF.fp(c) for c in card.claims if only is None or c["id"] in only}
+    Path(str(out_path) + ".fp.json").write_text(json.dumps(snap, ensure_ascii=False, indent=1), encoding="utf-8")
     shown = len(only) if only is not None else len(card.claims)
     print(f"wrote {out_path}：審 {shown}/{len(card.claims)} 條主張，{len(ref_no)} 條引文，"
           f"{len(para_no) if context == 'paragraph' else 0} 個段落（{context}），約 {len(''.join(lines))} 字")

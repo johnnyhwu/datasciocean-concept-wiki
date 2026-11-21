@@ -6,6 +6,7 @@
                      只在「合併階段」（提案確認、合併完成之後）加這個旗標；挖卡與提案階段不要用，
                      避免為了湊主張數而把卡寫大。預設不檢查。
       不給參數時另查 wiki/figures/ 有沒有沒被任何主張引用的圖（孤兒圖）。
+同篇卡之間引文完全相同的主張，錨點類型不一致 → ERROR（同一句話只有一個說話者）。
 結束碼：0 通過（可能有 HINT）、1 有 ERROR。
 HINT 不退回：主張數字不在來源原文、附圖不在 sources.sections 的小節內（交對證者）；
 主張有引文沒有的因果、範圍、絕對詞（params 的 wiki.strengthening_words，撰寫者自己確認）。
@@ -242,6 +243,25 @@ def check_card(card: W.Card, all_ids: set[str], params: dict, blogs: dict) -> tu
     return err, hint
 
 
+def anchor_conflicts(cards: list[W.Card]) -> list[str]:
+    """同一篇文章的卡之間，引文完全相同的主張，錨點類型必須一致（同一句話只有一個說話者）。"""
+    seen: dict[tuple, tuple[str, str, str]] = {}
+    out: list[str] = []
+    for card in cards:
+        arts = tuple(sorted(s.get("article") or "" for s in card.front.get("sources") or []))
+        for c in card.claims:
+            qs = c.get("source_quotes") or []
+            if not qs:
+                continue
+            key = (arts, tuple(sorted(W.normalize(q) for q in qs)))
+            here = (card.front.get("id"), c.get("id"), c.get("anchor_type"))
+            if key in seen and seen[key][2] != here[2]:
+                o = seen[key]
+                out.append(f"跨卡錨點不一致：{o[0]}:{o[1]}（{o[2]}）與 {here[0]}:{here[1]}（{here[2]}）引文相同")
+            seen.setdefault(key, here)
+    return out
+
+
 def check_claim_count(card: W.Card, params: dict) -> list[str]:
     """主張數必須在 wiki.card_claim_range 內（含 pending 主張）。只在合併階段用 --claim-count 啟用。"""
     lo, hi = params["wiki"]["card_claim_range"]
@@ -278,6 +298,11 @@ def main(argv: list[str]) -> int:
     if not argv:
         for o in orphan_figures(all_cards):
             print(f"ERROR 孤兒圖（沒有任何主張引用）：{o}")
+            failed = True
+    checked = {c.front.get("id") for c in cards}
+    for msg in anchor_conflicts(all_cards + [c for c in cards if c.path not in {a.path for a in all_cards}]):
+        if any(f"{i}:" in msg for i in checked):
+            print(f"ERROR {msg}")
             failed = True
     for card in cards:
         err, hint = check_card(card, all_ids, params, blogs)

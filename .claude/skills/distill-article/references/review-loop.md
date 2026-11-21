@@ -36,7 +36,7 @@
 1. `make_auditor_copy.py <card.md> <scratch>/<card>/aud.md`：主張後標 `[n]`，卡尾是參考文獻（blog 逐字原文）與引文所在的段落；附圖的主張列出圖檔路徑與圖說，對證者用 Read 看圖。（`stage1.auditor_context: quote` 只給引文，最省但看不到前後句。）
 2. 派全新 subagent，用 `auditor-prompt.md`。
 3. `verify_audit.py <card.md> <out.json> --copy <aud.md> [--only ids]`。附圖的主張，每張圖都要有 `figure_checks` 判「一致」並寫出位置與讀到的內容；矛盾、不相關、看不清、漏核、沒寫位置都是 blocker（pending 主張不擋）。圖不是證據：支持判定只看引文。
-4. 有 blocker → **先存指紋再改卡**：`claim_fingerprints.py save <accepted.json> <card.md> --blockers <被擋的 id>`（已經改了卡才想到，`--blockers` 填改過的 id）→ 撰寫者修 → `validate_card.py` → 下一輪只審 `claim_fingerprints.py diff` 列出的主張（`make_auditor_copy.py --only`、提示詞的 `ONLY_CLAIMS`、`verify_audit.py --only` 用同一份清單）。
+4. 每輪審完都存指紋，**一律帶 `--snapshot`**：`claim_fingerprints.py save <accepted.json> <card.md> --snapshot <aud.md>.fp.json [--blockers <被擋的 id>]`。快照是 `make_auditor_copy.py` 送審當下寫的，所以先改卡再 save 也只會存送審過的版本；不帶快照時存的是卡的現況，審完後改過的主張（例如只改錨點）會被誤存成通過、diff 就漏掉（subagent-fold 實跑遇過）。全文審查或讀者要求改卡時，accepted.json 已有改前的指紋，直接 diff 即可。有 blocker → 撰寫者修 → `validate_card.py` → 下一輪只審 `claim_fingerprints.py diff` 列出的主張（`make_auditor_copy.py --only`、提示詞的 `ONLY_CLAIMS`、`verify_audit.py --only` 用同一份清單）。
 5. 沒有 blocker → 過關。
 6. **補審合併派發**：同一輪要補審的多張卡併成**一個** subagent（範本見 `dispatch-templates.md` §2）。
 
