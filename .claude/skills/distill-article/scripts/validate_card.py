@@ -7,7 +7,8 @@
                      避免為了湊主張數而把卡寫大。預設不檢查。
       不給參數時另查 wiki/figures/ 有沒有沒被任何主張引用的圖（孤兒圖）。
 結束碼：0 通過（可能有 HINT）、1 有 ERROR。
-HINT 不退回，交給對證者（主張數字不在來源原文、附圖不在 sources.sections 的小節內）。
+HINT 不退回：主張數字不在來源原文、附圖不在 sources.sections 的小節內（交對證者）；
+主張有引文沒有的因果、範圍、絕對詞（params 的 wiki.strengthening_words，撰寫者自己確認）。
 """
 from __future__ import annotations
 
@@ -225,8 +226,14 @@ def check_card(card: W.Card, all_ids: set[str], params: dict, blogs: dict) -> tu
         if re.search(r"如圖|見圖|下圖|上圖|[如見上下]表(?!現)", str(c.get("text", ""))):
             hint.append(f"{tag} 主張文字有指向圖表的字眼（如圖、見表…）：主張必須不看圖也讀得懂，請改寫或確認")
 
-        # HINT：主張數字不在來源原文
         qnorm = "".join(W.normalize(q) for q in quote_texts if isinstance(q, str))
+        # HINT：撰寫者自己加的因果、範圍、絕對詞（主張有、引文沒有）
+        tnorm = W.normalize(str(c.get("text", "")))
+        added = [w for w in params["wiki"].get("strengthening_words", []) if w in tnorm and w not in qnorm]
+        if added:
+            hint.append(f"{tag} 主張有「{'、'.join(added)}」但引文沒有：確認不是自己加的因果、範圍或絕對詞")
+
+        # HINT：主張數字不在來源原文
         qnums = set(W.numbers_in("".join(str(q) for q in quote_texts)))
         for n in W.numbers_in(text):
             if n not in qnums:
@@ -246,12 +253,21 @@ def check_claim_count(card: W.Card, params: dict) -> list[str]:
     return []
 
 
+def parse_or_error(path: Path) -> W.Card:
+    """YAML 解析失敗的卡不讓整支程式崩潰：轉成這張卡的 ERROR，其他卡照驗。"""
+    try:
+        return W.parse_card(path)
+    except W.CardYAMLError as e:
+        return W.Card(path, {"id": path.stem}, [], [str(e)])
+
+
 def main(argv: list[str]) -> int:
     count_check = "--claim-count" in argv
     argv = [a for a in argv if a != "--claim-count"]
     params = W.load_params()
-    cards = [W.parse_card(Path(a)) for a in argv] if argv else W.load_all_cards()
-    all_cards = W.load_all_cards()
+    paths = [Path(a) for a in argv] if argv else sorted(W.CARDS_DIR.glob("*.md"))
+    cards = [parse_or_error(p) for p in paths]
+    all_cards = [parse_or_error(p) for p in sorted(W.CARDS_DIR.glob("*.md"))]
     all_ids = {c.front.get("id") for c in all_cards} | {c.front.get("id") for c in cards}
     dup = [i for i in all_ids if [c.front.get("id") for c in all_cards].count(i) > 1]
     blogs: dict = {}

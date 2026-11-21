@@ -198,6 +198,19 @@ class Card:
     errors: list[str] = field(default_factory=list)
 
 
+class CardYAMLError(ValueError):
+    """卡的 YAML 解析失敗；訊息已含位置與常見原因（validate_card 轉成 ERROR，其他腳本直接停下）。"""
+
+
+def _yaml_where(e: yaml.YAMLError) -> str:
+    """YAML 錯誤的一行說明（區塊內第幾行），加上最常見的原因。"""
+    mark = getattr(e, "problem_mark", None)
+    where = f"區塊內第 {mark.line + 1} 行第 {mark.column + 1} 欄" if mark else "位置不明"
+    problem = getattr(e, "problem", None) or str(e).splitlines()[0]
+    tip = "；文字含半形「: 」（或 [、#）時，整段要加雙引號" if "mapping values" in str(e) else ""
+    return f"{where}：{problem}{tip}"
+
+
 _FENCE = re.compile(r"```ya?ml\s*\n(.*?)\n```", re.S)
 
 
@@ -207,12 +220,18 @@ def parse_card(path: Path) -> Card:
     m = re.match(r"^---\n(.*?)\n---\n(.*)$", text, re.S)
     if not m:
         return Card(path, {}, [], ["缺少 YAML frontmatter"])
-    front = yaml.safe_load(m.group(1)) or {}
+    try:
+        front = yaml.safe_load(m.group(1)) or {}
+    except yaml.YAMLError as e:
+        raise CardYAMLError(f"{path.name}：frontmatter 的 YAML 解析失敗：{_yaml_where(e)}") from None
     claims: list[dict] = []
     errors: list[str] = []
     found = False
     for fence in _FENCE.finditer(m.group(2)):
-        data = yaml.safe_load(fence.group(1)) or {}
+        try:
+            data = yaml.safe_load(fence.group(1)) or {}
+        except yaml.YAMLError as e:
+            raise CardYAMLError(f"{path.name}：```yaml 區塊解析失敗：{_yaml_where(e)}") from None
         if isinstance(data, dict) and "claims" in data:
             found = True
             claims = data.get("claims") or []

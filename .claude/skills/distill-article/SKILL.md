@@ -39,7 +39,7 @@ description: 把 DataSci Ocean 的一篇 blog 文章提煉成觀念卡（Stage 1
 
 ## 誰做決定（2026-11-15 起）
 
-人挑好文章之後，撰寫者**一路做到寫入 wiki**，中間的判斷自己做，不停下來問；只有下面「嚴重的問題」才停。自己做的每個決定都寫進完成報告（`references/release.md` §3），讓人事後推翻。
+人挑好文章之後（人只說「挑下一篇」時，撰寫者挑 `blog/content/posts/` 裡還沒有卡的文章中 `date` 最新的一篇，並在報告寫明），撰寫者**一路做到寫入 wiki**，中間的判斷自己做，不停下來問；只有下面「嚴重的問題」才停。自己做的每個決定都寫進完成報告（`references/release.md` §3），讓人事後推翻。
 
 **撰寫者自己決定，照預設做法處理，事後報告：**
 
@@ -66,7 +66,7 @@ description: 把 DataSci Ocean 的一篇 blog 文章提煉成觀念卡（Stage 1
 
 | 腳本 | 用途 |
 |---|---|
-| `validate_card.py` | 結構驗證加引文逐字比對、附圖檢查（不指定檔案時驗全部卡並查孤兒圖）；`--claim-count` 另查主張數 |
+| `validate_card.py` | 結構驗證加引文逐字比對、附圖檢查（不指定檔案時驗全部卡並查孤兒圖）；`--claim-count` 另查主張數；HINT 提示主張有、引文沒有的因果與範圍詞 |
 | `copy_figure.py` | 把 blog 的一張圖複製進 `wiki/figures/<article>/`，印出可貼進主張 `figures` 的 YAML（`--indent N` 對齊縮排） |
 | `make_auditor_copy.py` | 產生對證者版卡（`--only` 只審改動的主張） |
 | `verify_audit.py` | 驗證對證者 JSON：引用逐字、分級、附圖的 figure_checks |

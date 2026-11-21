@@ -130,6 +130,31 @@ if _over is not None:
 else:
     check("claim-count：fixtures 內需有一張超過上限的卡來測旗標", False)
 
+# ---------------------------------------------------------------- 1c. HINT：自己加的因果、範圍、絕對詞；YAML 解析失敗
+def hints_of(card: W.Card) -> list[str]:
+    return VC.check_card(card, ALL_IDS, PARAMS, {})[1]
+
+
+_c1_text = claim(GOOD, "c1")["text"]
+check("validate HINT：主張有引文沒有的「因此」", any(h.startswith("[c1]") and "因此" in h and "但引文沒有" in h for h in hints_of(
+    mutated(lambda c: claim(c, "c1").update(text=_c1_text + "，因此所有輸出都可信")))))
+check("validate HINT：沒加詞的原卡不提示（測誤殺）", not any("但引文沒有" in h and h.startswith("[c1]") for h in hints_of(GOOD)))
+check("validate HINT：引文本身有那個詞就不提示（測誤殺）", not any(h.startswith("[c3]") and "所以" in h and "但引文沒有" in h for h in hints_of(GOOD)))
+with tempfile.TemporaryDirectory() as _tmp:
+    _bad = Path(_tmp) / "broken-yaml.md"
+    _bad.write_text(GOOD.path.read_text(encoding="utf-8").replace(
+        "text: 「不會幻覺」只保證輸出格式合法", "text: 註: 這句有半形冒號，「不會幻覺」只保證輸出格式合法", 1), encoding="utf-8")
+    try:
+        W.parse_card(_bad)
+        check("YAML 解析失敗：parse_card 丟出 CardYAMLError", False, "沒有丟出")
+    except W.CardYAMLError as e:
+        check("YAML 解析失敗：訊息含行號與加引號的提示", "第" in str(e) and "雙引號" in str(e), str(e))
+    _out = io.StringIO()
+    with contextlib.redirect_stdout(_out):
+        _rc = VC.main([str(_bad), str(GOOD.path)])
+    check("YAML 解析失敗：validate 轉成這張卡的 ERROR、其他卡照驗", _rc == 1 and "broken-yaml.md: FAIL" in _out.getvalue()
+          and f"{GOOD.path.name}: PASS" in _out.getvalue(), _out.getvalue()[:300])
+
 # ---------------------------------------------------------------- 2. make_auditor_copy：每條引文都定位得到
 for cid, card in CARDS.items():
     blogs = [W.load_blog(s["article"], PARAMS) for s in card.front["sources"]]
