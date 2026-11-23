@@ -19,6 +19,8 @@ related:
   - claude-code-extension-and-context
   - jevact-pre-execution-gate
   - judgment-skill-hard-rules-tool-code
+  - bash-add-ons-no-detectable-gain
+  - ptc-batching-vs-reach
 status: active
 ---
 

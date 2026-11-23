@@ -31,6 +31,7 @@ related:
   - clm-text-steering-and-skill-evolution
   - clm-results-tight-budget-not-across-the-board
   - claude-code-extension-and-context
+  - bash-vs-typed-tools-results
 status: active
 ---
 
