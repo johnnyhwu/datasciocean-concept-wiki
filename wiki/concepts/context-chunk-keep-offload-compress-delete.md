@@ -19,6 +19,8 @@ related:
   - clm-context-as-editable-file
   - claude-code-extension-and-context
   - intermediate-results-out-of-context
+  - skillstate-state-replaces-history
+  - discard-history-relevance-at-the-time
 status: active
 ---
 

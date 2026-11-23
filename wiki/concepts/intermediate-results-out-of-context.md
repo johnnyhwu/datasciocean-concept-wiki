@@ -24,6 +24,7 @@ related:
   - baseline-who-built-it
   - context-chunk-keep-offload-compress-delete
   - context-edit-cost-by-position
+  - skillstate-state-replaces-history
 status: active
 ---
 

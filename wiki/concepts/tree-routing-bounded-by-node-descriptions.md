@@ -26,6 +26,7 @@ related:
   - universalrag-router-design-and-rollout
   - rag-planner-single-round-vs-agentic
   - single-loop-progressive-disclosure
+  - discard-history-relevance-at-the-time
 status: active
 ---
 

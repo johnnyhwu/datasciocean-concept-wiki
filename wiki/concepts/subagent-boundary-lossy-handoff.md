@@ -22,6 +22,7 @@ related:
   - subagent-fold-eval-gated-migration
   - conway-law-agent-org-chart
   - claude-code-extension-and-context
+  - discard-history-relevance-at-the-time
 status: active
 ---
 
