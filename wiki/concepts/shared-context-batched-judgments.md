@@ -23,6 +23,7 @@ related:
   - verifier-expected-value-vs-argmax
   - confidence-three-metrics
   - jevmem-small-scorer-controls-memory
+  - pairwise-eval-swap-order-twice
 status: active
 ---
 
