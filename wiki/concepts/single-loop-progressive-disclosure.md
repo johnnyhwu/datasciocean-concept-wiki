@@ -27,6 +27,7 @@ related:
   - claude-code-agentic-loop-and-tools
   - claude-code-extension-and-context
   - tree-routing-bounded-by-node-descriptions
+  - evoontology-query-over-prompt-stuffing
 status: active
 ---
 

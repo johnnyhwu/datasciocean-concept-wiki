@@ -24,6 +24,7 @@ related:
   - skillopt-epoch-level-control
   - clm-text-steering-and-skill-evolution
   - subagent-fold-eval-gated-migration
+  - evoontology-evolution-loop-gate-first
 status: active
 ---
 

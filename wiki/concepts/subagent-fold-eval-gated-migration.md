@@ -30,6 +30,7 @@ related:
   - judgment-skill-hard-rules-tool-code
   - conway-law-agent-org-chart
   - skillopt-blind-acceptance-gate
+  - evoontology-evolution-loop-gate-first
 status: active
 ---
 
