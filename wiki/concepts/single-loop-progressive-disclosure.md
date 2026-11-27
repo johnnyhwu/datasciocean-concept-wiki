@@ -28,6 +28,7 @@ related:
   - claude-code-extension-and-context
   - tree-routing-bounded-by-node-descriptions
   - evoontology-query-over-prompt-stuffing
+  - pg-local-subgraph-vs-full-graph
 status: active
 ---
 

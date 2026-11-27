@@ -34,6 +34,7 @@ related:
   - skill-pack-vs-ontology-graph
   - skillopt-blind-acceptance-gate
   - subagent-fold-eval-gated-migration
+  - propose-validate-reject-evolution-loop
 status: active
 ---
 

@@ -31,6 +31,7 @@ related:
   - conway-law-agent-org-chart
   - skillopt-blind-acceptance-gate
   - evoontology-evolution-loop-gate-first
+  - propose-validate-reject-evolution-loop
 status: active
 ---
 

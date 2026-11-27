@@ -24,6 +24,7 @@ related:
   - evoontology-limits-backbone-and-cold-start
   - skill-pack-vs-ontology-graph
   - single-loop-progressive-disclosure
+  - pg-local-subgraph-vs-full-graph
 status: active
 ---
 

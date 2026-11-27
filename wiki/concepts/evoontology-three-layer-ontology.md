@@ -28,6 +28,7 @@ related:
   - evoontology-query-over-prompt-stuffing
   - evoontology-limits-backbone-and-cold-start
   - skill-pack-vs-ontology-graph
+  - pg-structure-and-inference
 status: active
 ---
 

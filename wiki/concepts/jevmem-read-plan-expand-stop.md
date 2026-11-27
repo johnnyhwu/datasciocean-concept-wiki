@@ -39,6 +39,7 @@ related:
   - rrf-rank-fusion
   - rag-planner-single-round-vs-agentic
   - universalrag-router-design-and-rollout
+  - pg-structure-and-inference
 status: active
 ---
 

@@ -25,6 +25,7 @@ related:
   - clm-text-steering-and-skill-evolution
   - subagent-fold-eval-gated-migration
   - evoontology-evolution-loop-gate-first
+  - propose-validate-reject-evolution-loop
 status: active
 ---
 
