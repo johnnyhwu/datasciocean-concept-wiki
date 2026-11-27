@@ -1,9 +1,9 @@
 """雙向寫入 `related`：不手改卡的 frontmatter（手改容易縮排錯、漏寫另一邊）。
 
 用法：
-  uv run python .claude/skills/distill-article/scripts/add_related.py <hub-id> <id> [<id> ...]
+  uv run python .agents/skills/distill-article/scripts/add_related.py <hub-id> <id> [<id> ...]
       hub 與每個 id 互設 related（例如新卡連到既有卡）。
-  uv run python .claude/skills/distill-article/scripts/add_related.py --mesh <id> <id> [<id> ...]
+  uv run python .agents/skills/distill-article/scripts/add_related.py --mesh <id> <id> [<id> ...]
       列出的卡兩兩互設（例如同一篇文章的卡）。
 已存在的連結不重複加；沿用該卡原本的清單縮排（沒有既有項目時用兩格）。只改 related，其餘文字不動。
 """

@@ -9,7 +9,7 @@ description: 把 DataSci Ocean 的一篇 blog 文章提煉成觀念卡（Stage 1
 
 ## 開始前（每次都做）
 
-1. 先做 CLAUDE.md「每次開始前」的兩件事（更新 blog submodule、環境）。腳本一律 `uv run python .claude/skills/distill-article/scripts/<name>.py`。
+1. 先做 AGENTS.md「每次開始前」的兩件事（更新 blog submodule、環境）。腳本一律 `uv run python .agents/skills/distill-article/scripts/<name>.py`。
 2. 讀 `docs/card-format.md`（契約）、`wiki/index.md`（看已有哪些觀念）、`config/background-terms.md`、`config/params.yaml`。
 3. 用 `blog/content/posts/*/<slug>/index.zh-tw.md` 找文章；文章的小節標題文字就是 `sources.sections` 要填的值。
 
@@ -49,7 +49,7 @@ description: 把 DataSci Ocean 的一篇 blog 文章提煉成觀念卡（Stage 1
 | 去重與關係 | 照 `release.md` §1 判斷；同篇互設 `related`，與既有卡只設 `related` |
 | blog 內部矛盾（含圖與文字對不上） | 照 `card-writing.md` §10：真矛盾標 `pending_author_confirmation`，措辭瑕疵用限定條件 resolve |
 | 新增或變動的 `pending_author_confirmation` | 照上一列標，報告列出 |
-| 非基本的通用知識詞 | 不用自己的知識補（CLAUDE.md 規則 1 不變）：改寫成不依賴它、取 blog 的說法，或不收那條主張；很基本的詞照 `card-writing.md` §7 補在「名詞補充」 |
+| 非基本的通用知識詞 | 不用自己的知識補（AGENTS.md 規則 1 不變）：改寫成不依賴它、取 blog 的說法，或不收那條主張；很基本的詞照 `card-writing.md` §7 補在「名詞補充」 |
 | 審查者與撰寫者的爭議 | 撰寫者仍不能反駁審查者：照審查者的意見改，改不了就刪掉那條或標 pending，取保守的一邊 |
 | 全文審查第 2 輪之後要不要跑第 3 輪、跨卡矛盾的處理 | 照 `review-loop.md` 關卡 3 的條件判斷 |
 

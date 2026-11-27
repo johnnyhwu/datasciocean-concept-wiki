@@ -3,7 +3,7 @@
 全文審查：整篇 blog 只讀一次，一個審查者同時審這篇文章提煉出的所有卡，專抓
 「引文以外」的問題：斷章取義、限定條件掉了、錨點歸屬、跨卡矛盾、blog 內部矛盾、卡漏掉的重點。
 
-用法：uv run python .claude/skills/distill-article/scripts/verify_final_audit.py <final.json> <card.md> [<card.md> ...]
+用法：uv run python .agents/skills/distill-article/scripts/verify_final_audit.py <final.json> <card.md> [<card.md> ...]
 分級（沿用 verify_audit.py 的原則）：
   擋下（blocker）：type 為「斷章取義」「限定條件掉了」，或「錨點歸屬錯」且該主張標「官方宣稱」。
   撰寫者裁決（escalate）：跨卡矛盾、blog 內部矛盾（照 SKILL.md「誰做決定」處理，寫進完成報告）。

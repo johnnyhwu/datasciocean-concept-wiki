@@ -4,7 +4,7 @@
 由程式保證，對證者只負責判斷「主張是否被這些原文完整支持」。
 
 用法：
-  uv run python .claude/skills/distill-article/scripts/make_auditor_copy.py <card.md> <out.md>
+  uv run python .agents/skills/distill-article/scripts/make_auditor_copy.py <card.md> <out.md>
         [--only c1,c3]      只審這些主張；其他主張只列文字供互核，不附引用
         [--context paragraph|quote]   引文帶出所在段落（預設，取 params 的 stage1.auditor_context）
                             或只給引文本身（最省，但對證者看不到前後句）

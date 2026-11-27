@@ -1,6 +1,6 @@
 """驗證對證者輸出並彙整退回清單（引用由程式驗證）。
 
-用法：uv run python .claude/skills/distill-article/scripts/verify_audit.py <card.md> <auditor.json>
+用法：uv run python .agents/skills/distill-article/scripts/verify_audit.py <card.md> <auditor.json>
         [--only c1,c3]      只看指定主張（補審改動的主張時用）
         [--copy <auditor-copy.md>]   對證者拿到的卡副本；引用必須出自這份副本（引用副本以外的 blog 原文
                                      代表對證者越界讀了 blog，列入備註）

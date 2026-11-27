@@ -1,6 +1,6 @@
 """共用函式：專案路徑、參數、卡片解析、blog 正規化與逐字比對。
 
-契約文件：docs/card-format.md；流程：.claude/skills/distill-article/。
+契約文件：docs/card-format.md；流程：.agents/skills/distill-article/。
 """
 from __future__ import annotations
 
@@ -17,9 +17,9 @@ import yaml
 def project_root() -> Path:
     p = Path(__file__).resolve()
     for parent in p.parents:
-        if (parent / "CLAUDE.md").exists() and (parent / "config").exists():
+        if (parent / "AGENTS.md").exists() and (parent / "config").exists():
             return parent
-    raise RuntimeError("找不到專案根目錄（需有 CLAUDE.md 與 config/）")
+    raise RuntimeError("找不到專案根目錄（需有 AGENTS.md 與 config/）")
 
 
 ROOT = project_root()

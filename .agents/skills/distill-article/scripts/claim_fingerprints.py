@@ -1,11 +1,11 @@
 """主張指紋：判斷哪些主張是「新增或改過的」，只重審它們。
 
 用法：
-  uv run python .claude/skills/distill-article/scripts/claim_fingerprints.py save <accepted.json> <card.md> --snapshot <aud.md>.fp.json [--blockers c1,c2]
+  uv run python .agents/skills/distill-article/scripts/claim_fingerprints.py save <accepted.json> <card.md> --snapshot <aud.md>.fp.json [--blockers c1,c2]
       把「送審時」未被擋下的主張指紋存進 accepted.json（累加）。--blockers 的主張不存。
       --snapshot 是 make_auditor_copy.py 寫出的快照：存的是送審當下的版本，所以審完先改卡再 save 也不會把改過的主張誤存成通過。
       不給 --snapshot 時退回用卡的現況（只適合卡在審完後完全沒動過），並印出警告。
-  uv run python .claude/skills/distill-article/scripts/claim_fingerprints.py diff <accepted.json> <card.md>
+  uv run python .agents/skills/distill-article/scripts/claim_fingerprints.py diff <accepted.json> <card.md>
       印出這張卡需要審的 claim id（指紋不在 accepted.json 裡的）。
 指紋涵蓋：role、text、source_quotes、anchor_type、comparison_target、qualifiers、status、numeric_*、figures（含 sha256，所以換圖會觸發重審）。
 """

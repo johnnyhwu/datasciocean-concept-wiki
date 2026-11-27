@@ -8,7 +8,7 @@
 卡檔案若在 claims 區塊外有「## 名詞補充」小節（撰寫者以通用知識補充的基本名詞，不是主張），原樣附在副本末尾：
 那是卡的一部分，讀者看得到才能判斷名詞有沒有被解釋。
 
-用法：uv run python .claude/skills/distill-article/scripts/make_reader_copy.py <card.md> <out.md>
+用法：uv run python .agents/skills/distill-article/scripts/make_reader_copy.py <card.md> <out.md>
 """
 from __future__ import annotations
 

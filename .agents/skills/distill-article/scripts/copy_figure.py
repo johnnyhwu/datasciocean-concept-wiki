@@ -1,6 +1,6 @@
 """把 blog 文章裡的一張圖複製進 wiki/figures/<article>/，並印出可貼進主張 `figures` 欄位的 YAML。
 
-用法：uv run python .claude/skills/distill-article/scripts/copy_figure.py <article-slug> <src> [--indent N]
+用法：uv run python .agents/skills/distill-article/scripts/copy_figure.py <article-slug> <src> [--indent N]
       src 是 blog 內文 `{{< image src="…" >}}` 裡的檔名（例如 figure3.png）。
       --indent N：印出的 YAML 每行縮排 N 個空格。貼進卡裡的主張時，填主張 `text` 同層的縮排
       （主張寫成 `- id: c1` 的清單項目時，是 2；主張在 `claims:` 底下縮排 2 時，是 4），可以直接貼不必手動對齊。

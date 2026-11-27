@@ -1,6 +1,6 @@
 """觀念卡驗證（結構驗證 + 來源原文逐字比對；規則見 docs/card-format.md §8）。
 
-用法：uv run python .claude/skills/distill-article/scripts/validate_card.py [--claim-count] [card.md ...]
+用法：uv run python .agents/skills/distill-article/scripts/validate_card.py [--claim-count] [card.md ...]
       不給參數則驗證 wiki/concepts/ 全部
       --claim-count：另外檢查每張卡的主張數是否在 params 的 wiki.card_claim_range 內（含 pending 主張）。
                      只在「合併階段」（提案確認、合併完成之後）加這個旗標；挖卡與提案階段不要用，

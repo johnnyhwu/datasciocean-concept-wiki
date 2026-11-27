@@ -1,6 +1,6 @@
 """驗證獨立讀者輸出（review-loop.md 關卡 2）。
 
-用法：uv run python .claude/skills/distill-article/scripts/verify_reader.py <reader_copy.md> <reader.json> [--trap N ...]
+用法：uv run python .agents/skills/distill-article/scripts/verify_reader.py <reader_copy.md> <reader.json> [--trap N ...]
 --trap：陷阱題（卡上確實沒答案）的題號（1 起算，預設只有最後一題）。
         只有陷阱題可以答「卡上沒寫」；其他題答「沒寫」代表讀者漏看，算失敗。
 - 主軸三題（論點、機制、證據）每題都要有「卡上真的存在」的引用；沒有就退回。答「卡上沒有」本身不通過主軸。

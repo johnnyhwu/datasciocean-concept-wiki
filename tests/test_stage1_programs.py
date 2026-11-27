@@ -3,7 +3,7 @@
 用法（repo 根目錄）：uv run python tests/test_stage1_programs.py
 範圍：validate_card（結構與逐字比對）、主張附圖（copy_figure、validate_card 的 figures 檢查、孤兒圖、指紋）、
 make_auditor_copy（引文都能定位）、make_reader_copy、verify_reader、verify_audit 與 verify_final_audit（分級規則）、add_related。審查者（subagent）本身的嚴格度不在這裡測，見
-.claude/skills/distill-article/references/regression-tests.md。
+.agents/skills/distill-article/references/regression-tests.md。
 修改任何程式檢查或審查流程後，要重跑這份。
 """
 from __future__ import annotations
@@ -23,7 +23,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 # 測試用的卡放在 tests/fixtures/concepts/（wiki/concepts/ 是真實觀念庫，可能是空的）
 os.environ["DSO_CARDS_DIR"] = str(ROOT / "tests" / "fixtures" / "concepts")
-sys.path.insert(0, str(ROOT / ".claude/skills/distill-article/scripts"))
+sys.path.insert(0, str(ROOT / ".agents/skills/distill-article/scripts"))
 
 import add_related as AR  # noqa: E402
 import claim_fingerprints as CF  # noqa: E402

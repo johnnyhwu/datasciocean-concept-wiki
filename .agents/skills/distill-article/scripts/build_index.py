@@ -1,6 +1,6 @@
 """產生 wiki/index.md：id | 一句話論點 | parent | related | status。
 index.md 由程式產生，不手改。去重與系列規劃都只讀這份，不需要打開每張卡。
-用法：uv run python .claude/skills/distill-article/scripts/build_index.py
+用法：uv run python .agents/skills/distill-article/scripts/build_index.py
 """
 from __future__ import annotations
 
