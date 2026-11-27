@@ -16,7 +16,7 @@ blog 文章（blog/ submodule）──[Stage 1：提煉觀念]──> wiki/conce
 
 1. `git submodule update --remote`（blog 要是最新的）。
 2. 缺環境才跑 `uv sync`。環境全在 repo 內（`.venv/`、`.uv-cache/`，設定在 `pyproject.toml`），**不要裝任何東西到全域**（不可違反）。腳本一律 `uv run python <script>`。
-3. 讀 blog 一律從 repo 根目錄用路徑讀，**不要 `cd` 進 `blog/`**：那會載入 blog repo 自己的 CLAUDE.md 與 skill（Hugo 發布流程），跟本 repo 無關。
+3. 讀 blog 一律從 repo 根目錄用路徑讀，**不要 `cd` 進 `blog/`**：那會載入 blog repo 自己的 AGENTS.md 與 skill（Hugo 發布流程），跟本 repo 無關。
 
 ## 要做什麼就讀什麼
 
