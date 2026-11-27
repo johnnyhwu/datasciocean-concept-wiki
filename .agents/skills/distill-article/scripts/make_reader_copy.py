@@ -34,7 +34,7 @@ def main(card_path: str, out_path: str) -> None:
         claims.append(d)
     text = (
         "# 觀念卡（讀者版）\n\n```yaml\n"
-        + yaml.safe_dump({"card": front, "claims": claims}, allow_unicode=True, sort_keys=False)
+        + yaml.safe_dump({"card": front, "claims": claims}, allow_unicode=True, sort_keys=False, width=10**9)
         + "```\n"
     )
     raw = Path(card_path).read_text(encoding="utf-8")

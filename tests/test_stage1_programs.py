@@ -653,5 +653,16 @@ with tempfile.TemporaryDirectory() as _tmp:
     b.claims[0]["anchor_type"] = edited.claims[0]["anchor_type"]
     check("跨卡錨點：引文相同、錨點不同 → 報出", len(VC.anchor_conflicts([a, b])) == 1, str(VC.anchor_conflicts([a, b])))
 
+    # make_reader_copy 不折行：主張在第 80 字元附近含 >= 時，不會把 > 折到行首而被 normalize 當 blockquote 刪掉
+    ge_card = copy.deepcopy(GOOD)
+    ge_text = "驗證閘門在獨立驗證集上計算候選圖平均分 S_val(G_k^cand)，採用規則是 S_val(G_k^cand) >= S_val(G_{k-1})（持平也收）"
+    ge_card.claims[0]["text"] = ge_text
+    ge_path = Path(_tmp) / "ge-card.md"
+    write_card_file(ge_card, ge_path)
+    ge_rd = Path(_tmp) / "ge-reader.md"
+    MRC.main(str(ge_path), str(ge_rd))
+    ge_norm = W.normalize(ge_rd.read_text(encoding="utf-8"))
+    check("reader copy：不折行，含 >= 的長主張逐字引用可匹配", W.quote_in_text(ge_text, ge_norm), ge_rd.read_text(encoding="utf-8")[:300])
+
 print(f"\n{'全部通過' if not fails else f'{len(fails)} 項失敗：' + '; '.join(fails)}")
 sys.exit(1 if fails else 0)
